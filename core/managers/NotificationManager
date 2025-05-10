@@ -1,0 +1,18 @@
+import Foundation
+
+class NotificationManager {
+    static let shared = NotificationManager()
+
+    private let teamsWebhookURL = URL(string: "https://your-teams-webhook-url")!
+
+    func send(message: String) {
+        var request = URLRequest(url: teamsWebhookURL)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let payload = ["text": message]
+        guard let data = try? JSONSerialization.data(withJSONObject: payload) else { return }
+
+        URLSession.shared.uploadTask(with: request, from: data).resume()
+    }
+}
