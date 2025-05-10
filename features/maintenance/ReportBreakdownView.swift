@@ -17,14 +17,21 @@ struct ReportBreakdownView: View {
             StandardBackground()
 
             VStack(spacing: 16) {
-                NavigationHeader(title: "Report Breakdown", onBack: { dismiss() })
+                NavigationHeader(
+                    title: "Report Breakdown",
+                    onBack: { dismiss() }
+                )
 
                 ScrollView {
                     VStack(spacing: 16) {
+
                         Button {
                             showScanner = true
                         } label: {
-                            SectionCard(icon: "qrcode.viewfinder", title: "Scan Area")
+                            ActionCard(
+                                iconName: "qrcode.viewfinder",
+                                title: "Scan Area"
+                            )
                         }
 
                         InputField(placeholder: "Zone", text: $zone)
@@ -46,23 +53,12 @@ struct ReportBreakdownView: View {
                             .padding(.horizontal)
 
                         Button("Submit Report") {
-                            // Hook up with NotificationManager & nav later
+                            // hook up with NotificationManager & nav later
                         }
                         .buttonStyle(.borderedProminent)
-                        .tint(.green)
                     }
                     .padding()
                 }
-            }
-        }
-        .sheet(isPresented: $showScanner) {
-            QRScannerView { result in
-                let parts = result.components(separatedBy: "-")
-                if parts.count >= 2 {
-                    zone = parts[0]
-                    equipment = parts[1]
-                }
-                showScanner = false
             }
         }
     }
