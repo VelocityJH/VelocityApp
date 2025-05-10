@@ -1,0 +1,38 @@
+import SwiftUI
+
+struct NavigationHeader: View {
+    let title: String
+    let onBack: () -> Void
+    let onHome: () -> Void
+
+    var body: some View {
+        HStack {
+            Button(action: onBack) {
+                Image(systemName: "arrow.left")
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(Color.blue)
+                    .clipShape(Circle())
+            }
+
+            Spacer()
+
+            Text(title)
+                .font(.title2)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+
+            Spacer()
+
+            Button(action: onHome) {
+                Image(systemName: "house.fill")
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(Color.blue)
+                    .clipShape(Circle())
+            }
+        }
+        .padding(.horizontal)
+        .padding(.top, 10)
+    }
+}
