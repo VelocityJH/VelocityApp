@@ -12,6 +12,8 @@ struct ReportBreakdownView: View {
     @State private var faultText: String = ""
     @State private var supportRequired: Bool = false
 
+    @State private var navigateToControl = false
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -21,7 +23,7 @@ struct ReportBreakdownView: View {
                     NavigationHeader(
                         title: "Report Breakdown",
                         onBack: { dismiss() },
-                        onHome: {} // Add home nav if needed
+                        onHome: {} // Add if needed
                     )
 
                     ScrollView {
@@ -53,7 +55,7 @@ struct ReportBreakdownView: View {
                                     }
                                 }
 
-                            InputField(placeholder: "Fault Description (Auto filled from image)", text: $faultText)
+                            InputField(placeholder: "Fault Description (Auto or Manual)", text: $faultText)
 
                             Toggle("Support Required", isOn: $supportRequired)
                                 .toggleStyle(SwitchToggleStyle(tint: .blue))
@@ -61,9 +63,23 @@ struct ReportBreakdownView: View {
 
                             Button("✅ Submit Breakdown") {
                                 submitBreakdown()
+                                navigateToControl = true
                             }
                             .buttonStyle(PrimaryButtonStyle(backgroundColor: .green))
                             .padding(.horizontal)
+
+                            // Auto-navigation to Control screen
+                            NavigationLink(
+                                destination: ControlBreakdownView(
+                                    zone: zone,
+                                    equipment: equipment,
+                                    fault: faultText,
+                                    supportRequested: supportRequired
+                                ),
+                                isActive: $navigateToControl
+                            ) {
+                                EmptyView()
+                            }
                         }
                         .padding(.top)
                     }
@@ -92,8 +108,5 @@ struct ReportBreakdownView: View {
             🔧 Support: \(supportRequired ? "Yes" : "No")
             """
         )
-
-        print("Breakdown submitted to manager.")
-        dismiss()
     }
 }
