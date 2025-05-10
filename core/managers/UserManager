@@ -1,0 +1,10 @@
+import Foundation
+import SwiftUI
+
+final class UserManager: ObservableObject {
+    static let shared = UserManager()
+
+    @Published var username: String = "Unknown"
+
+    private init() {}
+}
