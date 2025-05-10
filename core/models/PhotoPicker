@@ -1,0 +1,29 @@
+import SwiftUI
+import PhotosUI
+
+struct PhotoPicker: View {
+    @Binding var image: UIImage?
+
+    var body: some View {
+        PhotosPicker("Add Fault Image", selection: $photoItem, matching: .images)
+            .buttonStyle(.bordered)
+            .frame(maxWidth: .infinity)
+
+    }
+
+    @State private var photoItem: PhotosPickerItem?
+
+    func loadImage() {
+        Task {
+            if let data = try? await photoItem?.loadTransferable(type: Data.self),
+               let uiImage = UIImage(data: data) {
+                self.image = uiImage
+            }
+        }
+    }
+
+    private var photoItemObserver: some View {
+        EmptyView()
+            .task(id: photoItem) { loadImage() }
+    }
+}
