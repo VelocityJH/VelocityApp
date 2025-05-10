@@ -1,0 +1,41 @@
+import SwiftUI
+
+struct SparePartsScannerView: View {
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        ZStack {
+            Color(red: 0.0235, green: 0.1843, blue: 0.2941).ignoresSafeArea()
+
+            VStack {
+                header
+                Spacer()
+                Text("Spare Parts Scanner Placeholder")
+                    .foregroundColor(.white)
+                Spacer()
+            }
+        }
+    }
+
+    private var header: some View {
+        HStack {
+            Button(action: { dismiss() }) {
+                Image(systemName: "arrow.left")
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(Color.blue)
+                    .clipShape(Circle())
+            }
+            Spacer()
+            NavigationLink(destination: HomeView()) {
+                Image(systemName: "house.fill")
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(Color.blue)
+                    .clipShape(Circle())
+            }
+        }
+        .padding(.horizontal)
+        .padding(.top)
+    }
+}
