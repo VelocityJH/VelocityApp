@@ -1,76 +1,34 @@
+// Features/Home/HomeView.swift
 import SwiftUI
 
 struct HomeView: View {
-    @Environment(\.dismiss) var dismiss
-
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Color(red: 0.0235, green: 0.1843, blue: 0.2941).ignoresSafeArea()
+        ZStack {
+            StandardBackground()
 
-                VStack(spacing: 24) {
-                    headerButtons
+            VStack(spacing: 32) {
+                Spacer()
+                Image("VelocityLogo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 120)
 
-                    Spacer()
-
-                    VStack(spacing: 20) {
-                        homeOption(title: "Maintenance", destination: MaintenanceDashboardView())
-                        homeOption(title: "Manager Mode", destination: ManagerDashboardView())
-                        homeOption(title: "Admin Mode", destination: AdminDashboardView())
+                VStack(spacing: 20) {
+                    PrimaryButton(icon: "wrench.and.screwdriver", text: "Maintenance") {
+                        // Navigate to MaintenanceDashboard
                     }
 
-                    Spacer()
-
-                    Button("🔓 Log Out") {
-                        // Add logout logic here
+                    PrimaryButton(icon: "person.crop.rectangle", text: "Admin") {
+                        // Navigate to AdminView
                     }
-                    .foregroundColor(.red)
-                    .padding(.bottom)
+
+                    PrimaryButton(icon: "briefcase.fill", text: "Manager Mode") {
+                        // Navigate to ManagerDashboard
+                    }
                 }
-                .padding()
+
+                Spacer()
             }
         }
-    }
-
-    private var headerButtons: some View {
-        HStack {
-            Button(action: { dismiss() }) {
-                Image(systemName: "arrow.left")
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.blue.opacity(0.7))
-                    .clipShape(Circle())
-            }
-
-            Spacer()
-
-            Image("velocity_logo") // Replace with your logo asset name
-                .resizable()
-                .scaledToFit()
-                .frame(height: 40)
-
-            Spacer()
-
-            NavigationLink(destination: HomeView()) {
-                Image(systemName: "house.fill")
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.blue.opacity(0.7))
-                    .clipShape(Circle())
-            }
-        }
-    }
-
-    private func homeOption<T: View>(title: String, destination: T) -> some View {
-        NavigationLink(destination: destination) {
-            Text(title)
-                .font(.headline)
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.blue)
-                .cornerRadius(12)
-        }
-        .padding(.horizontal)
     }
 }
