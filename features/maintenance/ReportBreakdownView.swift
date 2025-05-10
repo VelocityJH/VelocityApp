@@ -21,48 +21,42 @@ struct ReportBreakdownView: View {
                     NavigationHeader(
                         title: "Report Breakdown",
                         onBack: { dismiss() },
-                        onHome: {} // Add nav to HomeView if needed
+                        onHome: {} // Add home nav if needed
                     )
 
                     ScrollView {
                         VStack(spacing: 16) {
-
-                            // QR Button
                             Button("Scan QR (Zone + Equipment)") {
                                 showScanner.toggle()
                             }
                             .buttonStyle(PrimaryButtonStyle(backgroundColor: .blue))
 
-                            // Manual Inputs
                             InputField(placeholder: "Zone", text: $zone)
                             InputField(placeholder: "Equipment", text: $equipment)
 
-                            // Fault Image
                             if let image = selectedImage {
                                 Image(uiImage: image)
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(height: 160)
+                                    .frame(height: 150)
                                     .cornerRadius(8)
                             }
 
-                            // PhotoPicker
                             PhotoPicker(image: $selectedImage)
                                 .onChange(of: selectedImage) { newImage in
                                     if let image = newImage {
-                                        OCRManager.extractText(from: image) { text in
+                                        OCRManager.extractText(from: image) { result in
                                             DispatchQueue.main.async {
-                                                self.faultText = text
+                                                self.faultText = result
                                             }
                                         }
                                     }
                                 }
 
-                            InputField(placeholder: "Fault description or auto-extracted code...", text: $faultText)
+                            InputField(placeholder: "Fault Description (Auto filled from image)", text: $faultText)
 
                             Toggle("Support Required", isOn: $supportRequired)
-                                .toggleStyle(.switch)
-                                .tint(.blue)
+                                .toggleStyle(SwitchToggleStyle(tint: .blue))
                                 .padding(.horizontal)
 
                             Button("✅ Submit Breakdown") {
@@ -89,6 +83,17 @@ struct ReportBreakdownView: View {
     }
 
     func submitBreakdown() {
-        print("Breakdown submitted: Zone=\(zone), Equipment=\(equipment)")
+        NotificationManager.shared.send(
+            message: """
+            🚨 Breakdown Reported
+            📍 Zone: \(zone)
+            🛠 Equipment: \(equipment)
+            📝 Fault: \(faultText)
+            🔧 Support: \(supportRequired ? "Yes" : "No")
+            """
+        )
+
+        print("Breakdown submitted to manager.")
+        dismiss()
     }
 }
