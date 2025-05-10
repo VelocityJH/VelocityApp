@@ -1,9 +1,9 @@
 import SwiftUI
 
 struct NavigationHeader: View {
-    let title: String
-    let onBack: () -> Void
-    let onHome: () -> Void
+    var title: String
+    var onBack: () -> Void
+    var onHome: () -> Void = {}
 
     var body: some View {
         HStack {
@@ -11,15 +11,12 @@ struct NavigationHeader: View {
                 Image(systemName: "arrow.left")
                     .foregroundColor(.white)
                     .padding()
-                    .background(Color.blue)
-                    .clipShape(Circle())
             }
 
             Spacer()
 
             Text(title)
-                .font(.title2)
-                .fontWeight(.bold)
+                .font(.headline)
                 .foregroundColor(.white)
 
             Spacer()
@@ -28,11 +25,9 @@ struct NavigationHeader: View {
                 Image(systemName: "house.fill")
                     .foregroundColor(.white)
                     .padding()
-                    .background(Color.blue)
-                    .clipShape(Circle())
             }
         }
         .padding(.horizontal)
-        .padding(.top, 10)
+        .background(Color.blue)
     }
 }
