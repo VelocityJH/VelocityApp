@@ -1,0 +1,23 @@
+import SwiftUI
+
+struct SectionCard: View {
+    let title: String
+    let iconName: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 10) {
+                Image(systemName: iconName)
+                    .font(.system(size: 28))
+                Text(title)
+                    .font(.subheadline)
+                    .multilineTextAlignment(.center)
+            }
+            .foregroundColor(.blue)
+            .frame(width: 120, height: 100)
+            .background(Color.white)
+            .cornerRadius(16)
+        }
+    }
+}
