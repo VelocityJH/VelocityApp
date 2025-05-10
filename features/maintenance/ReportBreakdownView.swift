@@ -1,148 +1,94 @@
 import SwiftUI
+import PhotosUI
 
 struct ReportBreakdownView: View {
-    @ObservedObject private var breakdownManager = BreakdownManager.shared
     @Environment(\.dismiss) var dismiss
 
+    @State private var selectedImage: UIImage?
+    @State private var showScanner = false
+
     @State private var zone: String = ""
-    @State private var area: String = ""
     @State private var equipment: String = ""
     @State private var faultText: String = ""
-    @State private var manualSummary: String = ""
-    @State private var supportRequested: Bool = false
-    @State private var selectedImage: UIImage?
-
-    @State private var showingQRScanner = false
-    @State private var showingCamera = false
-    @State private var navigateToControl = false
+    @State private var supportRequired: Bool = false
 
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(red: 0.0235, green: 0.1843, blue: 0.2941).ignoresSafeArea()
+                Color("AppBackground").ignoresSafeArea()
 
-                VStack(spacing: 20) {
-                    headerButtons
+                VStack(spacing: 16) {
+                    NavigationHeader(
+                        title: "Report Breakdown",
+                        onBack: { dismiss() },
+                        onHome: {} // Add nav to HomeView if needed
+                    )
 
                     ScrollView {
                         VStack(spacing: 16) {
-                            Text("Report Breakdown")
-                                .font(.title2)
-                                .foregroundColor(.white)
 
-                            Button("📷 Scan QR for Area & Equipment") {
-                                showingQRScanner = true
+                            // QR Button
+                            Button("Scan QR (Zone + Equipment)") {
+                                showScanner.toggle()
                             }
-                            .buttonStyle(.borderedProminent)
+                            .buttonStyle(PrimaryButtonStyle(backgroundColor: .blue))
 
-                            TextField("Zone", text: $zone)
-                                .textFieldStyle(.roundedBorder)
+                            // Manual Inputs
+                            InputField(placeholder: "Zone", text: $zone)
+                            InputField(placeholder: "Equipment", text: $equipment)
 
-                            TextField("Area", text: $area)
-                                .textFieldStyle(.roundedBorder)
-
-                            TextField("Equipment", text: $equipment)
-                                .textFieldStyle(.roundedBorder)
-
-                            Button("📸 Capture Fault Image") {
-                                showingCamera = true
-                            }
-                            .buttonStyle(.borderedProminent)
-
+                            // Fault Image
                             if let image = selectedImage {
                                 Image(uiImage: image)
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(height: 120)
+                                    .frame(height: 160)
                                     .cornerRadius(8)
                             }
 
-                            TextEditor(text: $faultText)
-                                .frame(height: 80)
-                                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.gray))
+                            // PhotoPicker
+                            PhotoPicker(image: $selectedImage)
+                                .onChange(of: selectedImage) { newImage in
+                                    if let image = newImage {
+                                        OCRManager.extractText(from: image) { text in
+                                            DispatchQueue.main.async {
+                                                self.faultText = text
+                                            }
+                                        }
+                                    }
+                                }
 
-                            TextField("Optional Summary", text: $manualSummary)
-                                .textFieldStyle(.roundedBorder)
+                            InputField(placeholder: "Fault description or auto-extracted code...", text: $faultText)
 
-                            Toggle("Request Support", isOn: $supportRequested)
-                                .tint(.red)
+                            Toggle("Support Required", isOn: $supportRequired)
+                                .toggleStyle(.switch)
+                                .tint(.blue)
+                                .padding(.horizontal)
 
                             Button("✅ Submit Breakdown") {
-                                let breakdown = Breakdown(
-                                    zone: zone,
-                                    area: area,
-                                    equipment: equipment,
-                                    image: selectedImage,
-                                    faultText: faultText,
-                                    manualSummary: manualSummary,
-                                    supportRequested: supportRequested,
-                                    startTime: Date(),
-                                    endTime: nil,
-                                    status: .open,
-                                    reporterName: UserManager.shared.username,
-                                    joinedEngineers: []
-                                )
-                                breakdownManager.addBreakdown(breakdown)
-                                NotificationManager.shared.send(message: "🛠 Breakdown reported at \(area) - \(equipment)")
-
-                                navigateToControl = true
+                                submitBreakdown()
                             }
-                            .buttonStyle(.borderedProminent)
-
-                            NavigationLink(destination: ControlBreakdownView(), isActive: $navigateToControl) {
-                                EmptyView()
-                            }
+                            .buttonStyle(PrimaryButtonStyle(backgroundColor: .green))
+                            .padding(.horizontal)
                         }
-                        .padding(.bottom)
+                        .padding(.top)
                     }
                 }
-                .padding()
             }
-        }
-        .sheet(isPresented: $showingCamera) {
-            ImagePicker(image: $selectedImage)
-                .onDisappear {
-                    if let image = selectedImage {
-                        extractText(from: image) { text in
-                            faultText = text
-                        }
+            .sheet(isPresented: $showScanner) {
+                QRScannerView { result in
+                    let parts = result.components(separatedBy: "-")
+                    if parts.count >= 2 {
+                        self.zone = parts[0]
+                        self.equipment = parts[1]
                     }
+                    showScanner = false
                 }
-        }
-        .sheet(isPresented: $showingQRScanner) {
-            QRScannerView { scanned in
-                let parts = scanned.components(separatedBy: ";")
-                if parts.count >= 2 {
-                    zone = parts[0]
-                    equipment = parts[1]
-                }
-                showingQRScanner = false
             }
         }
     }
 
-    private var headerButtons: some View {
-        HStack {
-            Button(action: { dismiss() }) {
-                Image(systemName: "arrow.left")
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.blue)
-                    .clipShape(Circle())
-            }
-            Spacer()
-            NavigationLink(destination: HomeView()) {
-                Image(systemName: "house.fill")
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.blue)
-                    .clipShape(Circle())
-            }
-        }
-    }
-
-    private func extractText(from image: UIImage, completion: @escaping (String) -> Void) {
-        // Plug in OCR (VisionKit or Tesseract later)
-        completion("⚠️ Auto-detected fault text placeholder")
+    func submitBreakdown() {
+        print("Breakdown submitted: Zone=\(zone), Equipment=\(equipment)")
     }
 }
