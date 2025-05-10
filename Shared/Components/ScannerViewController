@@ -1,0 +1,55 @@
+import UIKit
+import AVFoundation
+
+protocol QRScannerDelegate: AnyObject {
+    func didFind(code: String)
+}
+
+class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDelegate {
+    weak var delegate: QRScannerDelegate?
+
+    private let captureSession = AVCaptureSession()
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        guard let videoCaptureDevice = AVCaptureDevice.default(for: .video) else { return }
+        guard let videoInput = try? AVCaptureDeviceInput(device: videoCaptureDevice) else { return }
+
+        if captureSession.canAddInput(videoInput) {
+            captureSession.addInput(videoInput)
+        }
+
+        let metadataOutput = AVCaptureMetadataOutput()
+        if captureSession.canAddOutput(metadataOutput) {
+            captureSession.addOutput(metadataOutput)
+            metadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
+            metadataOutput.metadataObjectTypes = [.qr]
+        }
+
+        let previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
+        previewLayer.frame = view.layer.bounds
+        previewLayer.videoGravity = .resizeAspectFill
+        view.layer.addSublayer(previewLayer)
+
+        captureSession.startRunning()
+    }
+
+    func metadataOutput(_ output: AVCaptureMetadataOutput,
+                        didOutput metadataObjects: [AVMetadataObject],
+                        from connection: AVCaptureConnection) {
+        if let metadataObject = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
+           metadataObject.type == .qr,
+           let scannedValue = metadataObject.stringValue {
+            delegate?.didFind(code: scannedValue)
+            captureSession.stopRunning()
+        }
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        if captureSession.isRunning {
+            captureSession.stopRunning()
+        }
+    }
+}
