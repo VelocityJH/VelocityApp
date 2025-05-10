@@ -1,0 +1,42 @@
+import Foundation
+import UIKit
+
+final class BreakdownManager: ObservableObject {
+    static let shared = BreakdownManager()
+
+    @Published private(set) var openBreakdowns: [Breakdown] = []
+
+    private init() {}
+
+    func addBreakdown(_ breakdown: Breakdown) {
+        openBreakdowns.append(breakdown)
+    }
+
+    func updateStatus(for breakdown: Breakdown, to newStatus: BreakdownStatus) {
+        if let index = openBreakdowns.firstIndex(where: { $0.id == breakdown.id }) {
+            openBreakdowns[index].status = newStatus
+            openBreakdowns[index].endTime = Date()
+
+            NotificationManager.shared.send(
+                message: "✅ Job completed on \(breakdown.area) - \(breakdown.equipment) by \(UserManager.shared.username)"
+            )
+        }
+    }
+
+    func addEngineer(to breakdown: Breakdown, engineerName: String) {
+        if let index = openBreakdowns.firstIndex(where: { $0.id == breakdown.id }) {
+            if !openBreakdowns[index].joinedEngineers.contains(engineerName) {
+                openBreakdowns[index].joinedEngineers.append(engineerName)
+            }
+        }
+        NotificationManager.shared.send(
+            message: "🛠 \(engineerName) joined job on \(breakdown.area) - \(breakdown.equipment)"
+        )
+    }
+
+    func removeEngineer(from breakdown: Breakdown, engineerName: String) {
+        if let index = openBreakdowns.firstIndex(where: { $0.id == breakdown.id }) {
+            openBreakdowns[index].joinedEngineers.removeAll { $0 == engineerName }
+        }
+    }
+}
