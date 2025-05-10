@@ -1,33 +1,43 @@
-// Features/Home/HomeView.swift
 import SwiftUI
 
 struct HomeView: View {
     var body: some View {
-        ZStack {
-            StandardBackground()
+        NavigationStack {
+            ZStack {
+                Color("AppBackground").ignoresSafeArea()
 
-            VStack(spacing: 32) {
-                Spacer()
-                Image("VelocityLogo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 120)
+                VStack(spacing: 40) {
+                    Spacer()
 
-                VStack(spacing: 20) {
-                    PrimaryButton(icon: "wrench.and.screwdriver", text: "Maintenance") {
-                        // Navigate to MaintenanceDashboard
+                    // Logo placeholder
+                    Image("VelocityLogo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 120, height: 120)
+
+                    VStack(spacing: 20) {
+                        NavigationLink(destination: MaintenanceDashboardView()) {
+                            PrimaryButton(label: "Maintenance", color: .blue) {}
+                        }
+
+                        NavigationLink(destination: ManagerDashboardView()) {
+                            PrimaryButton(label: "Manager Mode", color: .blue) {}
+                        }
+
+                        NavigationLink(destination: AdminView()) {
+                            PrimaryButton(label: "Admin", color: .blue) {}
+                        }
                     }
+                    .padding(.horizontal)
 
-                    PrimaryButton(icon: "person.crop.rectangle", text: "Admin") {
-                        // Navigate to AdminView
-                    }
+                    Spacer()
 
-                    PrimaryButton(icon: "briefcase.fill", text: "Manager Mode") {
-                        // Navigate to ManagerDashboard
+                    Button("Log Out") {
+                        // Add logout logic here
                     }
+                    .foregroundColor(.white.opacity(0.7))
+                    .padding(.bottom)
                 }
-
-                Spacer()
             }
         }
     }
