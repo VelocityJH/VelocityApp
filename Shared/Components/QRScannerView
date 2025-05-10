@@ -1,8 +1,8 @@
+// QRScannerView.swift
 import SwiftUI
-import AVFoundation
 
 struct QRScannerView: UIViewControllerRepresentable {
-    var completion: (String) -> Void
+    var completion: (String?) -> Void
 
     func makeCoordinator() -> Coordinator {
         Coordinator(completion: completion)
@@ -17,59 +17,19 @@ struct QRScannerView: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: ScannerViewController, context: Context) {}
 
     class Coordinator: NSObject, QRScannerDelegate {
-        let completion: (String) -> Void
+        var completion: (String?) -> Void
 
-        init(completion: @escaping (String) -> Void) {
+        init(completion: @escaping (String?) -> Void) {
             self.completion = completion
         }
 
-        func didScan(result: String) {
-            completion(result)
+        func didFind(code: String) {
+            completion(code)
         }
-    }
-}
 
-protocol QRScannerDelegate: AnyObject {
-    func didScan(result: String)
-}
-
-class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDelegate {
-    var captureSession: AVCaptureSession!
-    weak var delegate: QRScannerDelegate?
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        captureSession = AVCaptureSession()
-
-        guard let videoCaptureDevice = AVCaptureDevice.default(for: .video),
-              let videoInput = try? AVCaptureDeviceInput(device: videoCaptureDevice),
-              captureSession.canAddInput(videoInput)
-        else { return }
-
-        captureSession.addInput(videoInput)
-
-        let metadataOutput = AVCaptureMetadataOutput()
-        captureSession.addOutput(metadataOutput)
-        metadataOutput.setMetadataObjectsDelegate(self, queue: .main)
-        metadataOutput.metadataObjectTypes = [.qr, .code128]
-
-        let previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-        previewLayer.frame = view.layer.bounds
-        previewLayer.videoGravity = .resizeAspectFill
-        view.layer.addSublayer(previewLayer)
-
-        captureSession.startRunning()
-    }
-
-    func metadataOutput(_ output: AVCaptureMetadataOutput,
-                        didOutput metadataObjects: [AVMetadataObject],
-                        from connection: AVCaptureConnection) {
-        guard let metadata = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
-              let stringValue = metadata.stringValue
-        else { return }
-
-        captureSession.stopRunning()
-        delegate?.didScan(result: stringValue)
-        dismiss(animated: true)
+        func didFail(reason: String) {
+            print("Scan failed: \(reason)")
+            completion(nil)
+        }
     }
 }
