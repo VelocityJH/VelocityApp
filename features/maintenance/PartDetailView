@@ -1,0 +1,47 @@
+import SwiftUI
+
+struct PartDetailView: View {
+    let part: SparePart
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        ZStack {
+            Color(red: 0.0235, green: 0.1843, blue: 0.2941).ignoresSafeArea()
+
+            VStack(spacing: 20) {
+                HStack {
+                    Button(action: { dismiss() }) {
+                        Image(systemName: "arrow.left")
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.blue)
+                            .clipShape(Circle())
+                    }
+                    Spacer()
+                    NavigationLink(destination: HomeView()) {
+                        Image(systemName: "house.fill")
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.blue)
+                            .clipShape(Circle())
+                    }
+                }
+                .padding(.horizontal)
+
+                Text(part.name)
+                    .font(.title)
+                    .foregroundColor(.white)
+
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Part Number: \(part.partNumber)")
+                    Text("Location: \(part.location)")
+                    Text("Stock: \(part.stock)")
+                }
+                .foregroundColor(.white)
+
+                Spacer()
+            }
+            .padding()
+        }
+    }
+}
