@@ -1,28 +1,32 @@
+// Components/ActionCard.swift
+
 import SwiftUI
 
 struct ActionCard: View {
     var iconName: String
     var title: String
+    var backgroundColor: Color = Color.white
+    var foregroundColor: Color = .blue
     var action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            HStack {
+            VStack(spacing: 8) {
                 Image(systemName: iconName)
-                    .font(.title)
-                    .foregroundColor(.white)
-                    .padding(.trailing, 8)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 30, height: 30)
+                    .foregroundColor(foregroundColor)
 
                 Text(title)
                     .font(.headline)
-                    .foregroundColor(.white)
-
-                Spacer()
+                    .foregroundColor(foregroundColor)
             }
             .padding()
-            .background(Color.blue)
+            .frame(maxWidth: .infinity)
+            .background(backgroundColor)
             .cornerRadius(12)
-            .shadow(radius: 4)
+            .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
         }
     }
 }
