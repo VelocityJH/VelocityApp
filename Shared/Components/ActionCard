@@ -1,0 +1,28 @@
+import SwiftUI
+
+struct ActionCard: View {
+    var iconName: String
+    var title: String
+    var action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack {
+                Image(systemName: iconName)
+                    .font(.title)
+                    .foregroundColor(.white)
+                    .padding(.trailing, 8)
+
+                Text(title)
+                    .font(.headline)
+                    .foregroundColor(.white)
+
+                Spacer()
+            }
+            .padding()
+            .background(Color.blue)
+            .cornerRadius(12)
+            .shadow(radius: 4)
+        }
+    }
+}
