@@ -1,0 +1,42 @@
+import SwiftUI
+
+struct TopNavBar: View {
+    let title: String
+    let showBack: Bool
+    let showHome: Bool
+    let onBack: (() -> Void)?
+    let onHome: (() -> Void)?
+
+    var body: some View {
+        HStack {
+            if showBack {
+                Button(action: { onBack?() }) {
+                    Image(systemName: "arrow.left.circle.fill")
+                        .font(.title2)
+                }
+            } else {
+                Spacer().frame(width: 32)
+            }
+
+            Spacer()
+
+            Text(title)
+                .font(.headline)
+                .bold()
+
+            Spacer()
+
+            if showHome {
+                Button(action: { onHome?() }) {
+                    Image(systemName: "house.fill")
+                        .font(.title2)
+                }
+            } else {
+                Spacer().frame(width: 32)
+            }
+        }
+        .foregroundColor(.white)
+        .padding(.horizontal)
+        .padding(.top)
+    }
+}
