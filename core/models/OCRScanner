@@ -1,0 +1,29 @@
+import Vision
+import UIKit
+
+class OCRManager {
+    static func extractText(from image: UIImage, completion: @escaping (String) -> Void) {
+        guard let cgImage = image.cgImage else {
+            completion("")
+            return
+        }
+
+        let requestHandler = VNImageRequestHandler(cgImage: cgImage)
+        let request = VNRecognizeTextRequest { request, error in
+            guard error == nil else {
+                completion("")
+                return
+            }
+
+            let text = request.results?
+                .compactMap { $0 as? VNRecognizedTextObservation }
+                .compactMap { $0.topCandidates(1).first?.string }
+                .joined(separator: "\n") ?? ""
+
+            completion(text)
+        }
+
+        request.recognitionLevel = .accurate
+        try? requestHandler.perform([request])
+    }
+}
