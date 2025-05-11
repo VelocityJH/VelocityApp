@@ -16,30 +16,46 @@ struct MaintenanceDashboardView: View {
                 NavigationHeader(
                     title: "Maintenance",
                     onBack: { dismiss() },
-                    onHome: { dismiss() } // Replace with actual navigation
+                    onHome: { dismiss() }
                 )
 
                 ScrollView {
-                    LazyVGrid(columns: columns, alignment: .center, spacing: 16) {
-                        ActionCard(iconName: "doc.text.fill", title: "Report Breakdown") {}
-                            .frame(width: 250, height: 250)
-                        ActionCard(iconName: "cube.box.fill", title: "Check Stock") {}
-                            .frame(width: 250, height: 250)
-                        ActionCard(iconName: "book.fill", title: "Fault Trees & Manuals") {}
-                            .frame(width: 250, height: 250)
-                        ActionCard(iconName: "list.bullet.rectangle", title: "Open Jobs") {}
-                            .frame(width: 250, height: 250)
-                        ActionCard(iconName: "arrow.2.circlepath.circle.fill", title: "Shift Handover") {}
-                            .frame(width: 250, height: 250)
-                        ActionCard(iconName: "calendar.badge.plus", title: "CWO Creation") {}
-                            .frame(width: 250, height: 250)
-                        ActionCard(iconName: "doc.badge.gearshape", title: "Planned Maintenance") {}
-                            .frame(width: 250, height: 250)
+                    LazyVGrid(columns: columns, spacing: 16) {
+                        ForEach(buttonData, id: \.title) { item in
+                            ActionCard(iconName: item.icon, title: item.title, action: item.action)
+                                .frame(width: 250, height: 250)
+                        }
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.horizontal)
+                    .padding(.bottom, 40)
                 }
             }
+            .padding(.top, 20)
+        }
+    }
+
+    // Dummy data model for preview and structure
+    private var buttonData: [ActionItem] {
+        [
+            .init("doc.text.fill", "Report Breakdown"),
+            .init("cube.box.fill", "Check Stock"),
+            .init("book.fill", "Fault Trees & Manuals"),
+            .init("list.bullet.rectangle", "Open Jobs"),
+            .init("arrow.2.circlepath.circle.fill", "Shift Handover"),
+            .init("calendar.badge.plus", "CWO Creation"),
+            .init("doc.badge.gearshape", "Planned Maintenance")
+        ]
+    }
+
+    struct ActionItem {
+        let icon: String
+        let title: String
+        var action: () -> Void = {}
+        init(_ icon: String, _ title: String, action: @escaping () -> Void = {}) {
+            self.icon = icon
+            self.title = title
+            self.action = action
         }
     }
 }
