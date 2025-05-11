@@ -14,7 +14,7 @@ struct MaintenanceDashboardView: View {
                 TopNavBar(
                     title: "Maintenance",
                     onBack: { dismiss() },
-                    onHome: { dismiss() } // Replace with proper routing
+                    onHome: { dismiss() } // Replace with real root nav
                 )
 
                 LazyVGrid(columns: columns, spacing: 16) {
