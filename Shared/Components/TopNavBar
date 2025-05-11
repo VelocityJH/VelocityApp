@@ -1,42 +1,29 @@
+// /Components/TopNavBar.swift
+
 import SwiftUI
 
 struct TopNavBar: View {
-    let title: String
-    let showBack: Bool
-    let showHome: Bool
-    let onBack: (() -> Void)?
-    let onHome: (() -> Void)?
+    @Environment(\.dismiss) private var dismiss
+    var onHome: () -> Void
 
     var body: some View {
         HStack {
-            if showBack {
-                Button(action: { onBack?() }) {
-                    Image(systemName: "arrow.left.circle.fill")
-                        .font(.title2)
-                }
-            } else {
-                Spacer().frame(width: 32)
+            Button(action: { dismiss() }) {
+                Image(systemName: "arrow.left")
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(Circle().fill(Color.blue))
             }
 
             Spacer()
 
-            Text(title)
-                .font(.headline)
-                .bold()
-
-            Spacer()
-
-            if showHome {
-                Button(action: { onHome?() }) {
-                    Image(systemName: "house.fill")
-                        .font(.title2)
-                }
-            } else {
-                Spacer().frame(width: 32)
+            Button(action: { onHome() }) {
+                Image(systemName: "house.fill")
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(Circle().fill(Color.blue))
             }
         }
-        .foregroundColor(.white)
         .padding(.horizontal)
-        .padding(.top)
     }
 }
