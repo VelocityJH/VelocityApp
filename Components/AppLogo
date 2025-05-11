@@ -1,0 +1,24 @@
+// /Components/AppLogo.swift
+
+import SwiftUI
+
+struct AppLogo: View {
+    private let imageName = "VelocityLogo"
+
+    var body: some View {
+        if UIImage(named: imageName) != nil {
+            Image(imageName)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 120, height: 120)
+        } else {
+            Text("Velocity")
+                .font(.system(size: 28, weight: .bold, design: .rounded))
+                .foregroundColor(.white)
+                .padding()
+                .frame(width: 120, height: 120)
+                .background(Color.gray)
+                .cornerRadius(16)
+        }
+    }
+}
