@@ -1,4 +1,5 @@
 // Features/Home/HomeView.swift
+
 import SwiftUI
 
 struct HomeView: View {
@@ -11,24 +12,33 @@ struct HomeView: View {
                     AppLogo()
 
                     VStack(spacing: 20) {
-                        NavigationLink("Maintenance") {
+                        NavigationLink {
                             MaintenanceDashboardView()
+                        } label: {
+                            PrimaryButtonStyle(label: "Maintenance", color: .blue)
                         }
 
-                        NavigationLink("Manager Mode") {
+                        NavigationLink {
                             ManagerDashboardView()
+                        } label: {
+                            PrimaryButtonStyle(label: "Manager Mode", color: .blue)
                         }
 
-                        NavigationLink("Admin") {
+                        NavigationLink {
                             AdminDashboardView()
+                        } label: {
+                            PrimaryButtonStyle(label: "Admin", color: .blue)
                         }
                     }
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                    .padding(.horizontal, 32)
+                    .padding(.horizontal)
                 }
-                .padding(.top, 40)
+                .padding(.top, 60)
             }
+            .navigationBarHidden(true)
         }
     }
+}
+
+#Preview {
+    HomeView()
 }
