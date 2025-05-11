@@ -1,14 +1,8 @@
 import SwiftUI
 
-struct StandardBackground: ViewModifier {
-    func body(content: Content) -> some View {
-        content
-            .background(Color("AppBackground").ignoresSafeArea())
-    }
-}
-
-extension View {
-    func standardBackground() -> some View {
-        self.modifier(StandardBackground())
+struct StandardBackground: View {
+    var body: some View {
+        Color("AppBackground") // Make sure this exists in Assets
+            .ignoresSafeArea()
     }
 }
