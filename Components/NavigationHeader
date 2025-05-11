@@ -1,36 +1,29 @@
+// /Components/TopNavBar.swift
+
 import SwiftUI
 
-struct NavigationHeader: View {
-    var title: String
-    var onBack: () -> Void
+struct TopNavBar: View {
+    @Environment(\.dismiss) private var dismiss
     var onHome: () -> Void
 
     var body: some View {
-        VStack(spacing: 16) {
-            HStack {
-                Button(action: onBack) {
-                    Image(systemName: "arrow.left")
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(Color.blue)
-                        .clipShape(Circle())
-                }
-
-                Spacer()
-
-                Button(action: onHome) {
-                    Image(systemName: "house.fill")
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(Color.blue)
-                        .clipShape(Circle())
-                }
+        HStack {
+            Button(action: { dismiss() }) {
+                Image(systemName: "arrow.left")
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(Circle().fill(Color.blue))
             }
-            .padding(.horizontal)
 
-            Text(title)
-                .font(.title2)
-                .foregroundColor(.white)
+            Spacer()
+
+            Button(action: { onHome() }) {
+                Image(systemName: "house.fill")
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(Circle().fill(Color.blue))
+            }
         }
+        .padding(.horizontal)
     }
 }
