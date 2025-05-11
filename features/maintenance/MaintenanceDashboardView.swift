@@ -3,6 +3,11 @@ import SwiftUI
 struct MaintenanceDashboardView: View {
     @Environment(\.dismiss) var dismiss
 
+    private let columns = [
+        GridItem(.flexible(), spacing: 16),
+        GridItem(.flexible(), spacing: 16)
+    ]
+
     var body: some View {
         ZStack {
             StandardBackground()
@@ -11,59 +16,34 @@ struct MaintenanceDashboardView: View {
                 NavigationHeader(
                     title: "Maintenance",
                     onBack: { dismiss() },
-                    onHome: { dismiss() } // Replace with routing logic if needed
+                    onHome: { dismiss() } // Replace with actual navigation
                 )
 
                 ScrollView {
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 200)), count: 2)) {
-                        ActionCard(
-                            iconName: "doc.text.fill",
-                            title: "Report Breakdown",
-                            action: { /* Navigate to Report Breakdown */ }
-                        )
-
-                        ActionCard(
-                            iconName: "cube.box.fill",
-                            title: "Check Stock",
-                            action: { /* Navigate to Check Stock */ }
-                        )
-
-                        ActionCard(
-                            iconName: "book.fill",
-                            title: "Fault Trees & Manuals",
-                            action: { /* Navigate to Manuals */ }
-                        )
-
-                        ActionCard(
-                            iconName: "list.bullet.rectangle",
-                            title: "Open Jobs",
-                            action: { /* Navigate to Jobs */ }
-                        )
-
-                        ActionCard(
-                            iconName: "arrow.2.circlepath.circle.fill",
-                            title: "Shift Handover",
-                            action: { /* Navigate to Handover */ }
-                        )
-
-                        ActionCard(
-                            iconName: "calendar.badge.plus",
-                            title: "CWO Creation",
-                            action: { /* Navigate to CWO */ }
-                        )
-
-                        ActionCard(
-                            iconName: "doc.badge.gearshape",
-                            title: "Planned Maintenance",
-                            action: { /* Navigate to PM */ }
-                        )
+                    LazyVGrid(columns: columns, alignment: .center, spacing: 16) {
+                        ActionCard(iconName: "doc.text.fill", title: "Report Breakdown") {}
+                            .frame(width: 250, height: 250)
+                        ActionCard(iconName: "cube.box.fill", title: "Check Stock") {}
+                            .frame(width: 250, height: 250)
+                        ActionCard(iconName: "book.fill", title: "Fault Trees & Manuals") {}
+                            .frame(width: 250, height: 250)
+                        ActionCard(iconName: "list.bullet.rectangle", title: "Open Jobs") {}
+                            .frame(width: 250, height: 250)
+                        ActionCard(iconName: "arrow.2.circlepath.circle.fill", title: "Shift Handover") {}
+                            .frame(width: 250, height: 250)
+                        ActionCard(iconName: "calendar.badge.plus", title: "CWO Creation") {}
+                            .frame(width: 250, height: 250)
+                        ActionCard(iconName: "doc.badge.gearshape", title: "Planned Maintenance") {}
+                            .frame(width: 250, height: 250)
                     }
-                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal)
                 }
             }
         }
     }
 }
+
 #Preview {
     MaintenanceDashboardView()
 }
