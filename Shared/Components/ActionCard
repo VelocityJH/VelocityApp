@@ -1,3 +1,4 @@
+// Components/ActionCard.swift
 import SwiftUI
 
 struct ActionCard: View {
@@ -10,13 +11,16 @@ struct ActionCard: View {
                 .resizable()
                 .scaledToFit()
                 .frame(height: 40)
+                .foregroundColor(.blue)
 
             Text(title)
                 .font(.headline)
+                .foregroundColor(.blue)
+                .multilineTextAlignment(.center)
         }
-        .frame(width: 160, height: 160)
+        .frame(width: 200, height: 200)
         .background(Color.white)
-        .cornerRadius(20)
-        .shadow(radius: 4)
+        .cornerRadius(16)
+        .shadow(color: .black.opacity(0.1), radius: 6, x: 0, y: 4)
     }
 }
