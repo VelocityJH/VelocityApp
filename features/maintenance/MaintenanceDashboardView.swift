@@ -4,50 +4,59 @@ struct MaintenanceDashboardView: View {
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Color("AppBackground").ignoresSafeArea()
+        ZStack {
+            StandardBackground()
 
-                VStack(spacing: 20) {
-                    NavigationHeader(
-                        title: "Maintenance",
-                        onBack: { dismiss() },
-                        onHome: {} // Add navigation to HomeView if needed
-                    )
+            VStack(spacing: 20) {
+                NavigationHeader(title: "Maintenance", onBack: { dismiss() })
 
-                    ScrollView {
-                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
-
-                            SectionCard(title: "Report Breakdown", iconName: "exclamationmark.triangle.fill") {
-                                // Navigate to ReportBreakdownView
+                ScrollView {
+                    VStack(spacing: 16) {
+                        ActionCard(
+                            iconName: "doc.text.fill",
+                            title: "Report Breakdown",
+                            action: {
+                                // Navigate to ReportBreakdownView()
                             }
+                        )
 
-                            SectionCard(title: "Check Stock", iconName: "shippingbox.fill") {
-                                // Navigate to CheckStockView
-                            }
+                        ActionCard(
+                            iconName: "cube.box.fill",
+                            title: "Check Stock",
+                            action: {}
+                        )
 
-                            SectionCard(title: "Fault Trees & Manuals", iconName: "book.fill") {
-                                // Navigate to ManualsView
-                            }
+                        ActionCard(
+                            iconName: "book.fill",
+                            title: "Fault Trees & Manuals",
+                            action: {}
+                        )
 
-                            SectionCard(title: "Open Jobs", iconName: "list.bullet.rectangle") {
-                                // Navigate to OpenJobsView
-                            }
+                        ActionCard(
+                            iconName: "list.bullet.rectangle",
+                            title: "Open Jobs",
+                            action: {}
+                        )
 
-                            SectionCard(title: "Shift Handover", iconName: "arrow.triangle.2.circlepath") {
-                                // Navigate to ShiftHandoverView
-                            }
+                        ActionCard(
+                            iconName: "arrow.2.circlepath.circle.fill",
+                            title: "Shift Handover",
+                            action: {}
+                        )
 
-                            SectionCard(title: "CWO Creation", iconName: "plus.square.on.square") {
-                                // Navigate to CWOCreationView
-                            }
+                        ActionCard(
+                            iconName: "doc.badge.gearshape",
+                            title: "Planned Maintenance",
+                            action: {}
+                        )
 
-                            SectionCard(title: "Planned Maintenance", iconName: "calendar.badge.clock") {
-                                // Navigate to PlannedMaintenanceView
-                            }
-                        }
-                        .padding()
+                        ActionCard(
+                            iconName: "calendar.badge.plus",
+                            title: "CWO Creation",
+                            action: {}
+                        )
                     }
+                    .padding()
                 }
             }
         }
