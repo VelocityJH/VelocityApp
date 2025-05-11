@@ -1,47 +1,24 @@
 import SwiftUI
 
 struct AdminDashboardView: View {
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.dismiss) var dismiss
 
     var body: some View {
-        ZStack {
-            Color(red: 0.00235, green: 0.1843, blue: 0.2941).ignoresSafeArea()
-
-            VStack(spacing: 20) {
-                header
-
-                Spacer()
+        ScrollView {
+            VStack(spacing: 16) {
+                TopNavBar(
+                    title: "Admin Mode",
+                    onBack: { dismiss() },
+                    onHome: { dismiss() }
+                )
 
                 Text("Admin features coming soon...")
-                    .foregroundColor(.gray)
-
-                Spacer()
+                    .font(.title3)
+                    .foregroundColor(.white)
+                    .padding(.top, 100)
             }
             .padding()
         }
-    }
-
-    private var header: some View {
-        HStack {
-            Button(action: { dismiss() }) {
-                Image(systemName: "arrow.left")
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.blue)
-                    .clipShape(Circle())
-            }
-
-            Spacer()
-
-            NavigationLink(destination: HomeView()) {
-                Image(systemName: "house.fill")
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.blue)
-                    .clipShape(Circle())
-            }
-        }
-        .padding(.horizontal)
-        .padding(.top)
+        .background(StandardBackground())
     }
 }
