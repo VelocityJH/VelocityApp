@@ -1,29 +1,40 @@
+// Shared/Components/PhotoPicker.swift
+
 import SwiftUI
 import PhotosUI
 
 struct PhotoPicker: View {
     @Binding var image: UIImage?
 
+    @State private var selectedItem: PhotosPickerItem?
+
     var body: some View {
-        PhotosPicker("Add Fault Image", selection: $photoItem, matching: .images)
-            .buttonStyle(.bordered)
-            .frame(maxWidth: .infinity)
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Attach Photo (Optional)")
+                .foregroundColor(.white)
 
-    }
-
-    @State private var photoItem: PhotosPickerItem?
-
-    func loadImage() {
-        Task {
-            if let data = try? await photoItem?.loadTransferable(type: Data.self),
-               let uiImage = UIImage(data: data) {
-                self.image = uiImage
+            PhotosPicker(selection: $selectedItem, matching: .images) {
+                HStack {
+                    Image(systemName: "camera.fill")
+                    Text(image != nil ? "Change Photo" : "Select Photo")
+                }
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(Color.white)
+                .cornerRadius(10)
+            }
+        }
+        .onChange(of: selectedItem) { newItem in
+            Task {
+                if let data = try? await newItem?.loadTransferable(type: Data.self),
+                   let uiImage = UIImage(data: data) {
+                    image = uiImage
+                }
             }
         }
     }
+}
 
-    private var photoItemObserver: some View {
-        EmptyView()
-            .task(id: photoItem) { loadImage() }
-    }
+#Preview {
+    PhotoPicker(image: .constant(nil))
 }
