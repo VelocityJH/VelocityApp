@@ -1,3 +1,5 @@
+// Features/ReportBreakdown/ReportBreakdownView.swift
+
 import SwiftUI
 
 struct ReportBreakdownView: View {
@@ -5,40 +7,36 @@ struct ReportBreakdownView: View {
 
     @State private var zone: String = ""
     @State private var equipment: String = ""
-    @State private var faultText: String = ""
-    @State private var supportRequired: Bool = false
+    @State private var faultSummary: String = ""
+    @State private var selectedImage: UIImage?
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: 16) {
                 TopNavBar(
                     title: "Report Breakdown",
                     onBack: { dismiss() },
-                    onHome: { dismiss() }
+                    onHome: { dismiss() } // Replace with your routing logic
                 )
 
-                VStack(spacing: 16) {
-                    TextField("Zone", text: $zone)
-                        .textFieldStyle(.roundedBorder)
+                InputField(placeholder: "Zone", text: $zone)
+                InputField(placeholder: "Equipment", text: $equipment)
+                InputField(placeholder: "Fault Summary", text: $faultSummary)
 
-                    TextField("Equipment", text: $equipment)
-                        .textFieldStyle(.roundedBorder)
+                PhotoPicker(image: $selectedImage)
 
-                    TextField("Fault Summary", text: $faultText)
-                        .textFieldStyle(.roundedBorder)
-
-                    Toggle("Support Required", isOn: $supportRequired)
-                }
-                .padding()
-
-                Button("Submit Breakdown") {
-                    // Submit stub
+                Button("Submit Report") {
+                    // handle submit logic
                 }
                 .buttonStyle(.borderedProminent)
-                .padding(.bottom, 40)
+                .padding(.top)
             }
             .padding()
         }
-        .background(StandardBackground())
+        .background(Color("AppBackground").ignoresSafeArea())
     }
+}
+
+#Preview {
+    ReportBreakdownView()
 }
