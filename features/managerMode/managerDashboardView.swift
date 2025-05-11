@@ -1,74 +1,30 @@
 import SwiftUI
 
-struct ManagerDashboardView: View {
-    @Environment(\.dismiss) private var dismiss
+struct MaintenanceDashboardView: View {
+    @Environment(\.dismiss) var dismiss
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Color(red: 0.00235, green: 0.1843, blue: 0.2941).ignoresSafeArea()
+        ZStack {
+            StandardBackground()
 
-                VStack(spacing: 20) {
-                    header
+            VStack(spacing: 20) {
+                NavigationHeader(title: "Maintenance", onBack: { dismiss() })
 
-                    Text("Manager Dashboard")
-                        .font(.title2)
-                        .foregroundColor(.white)
-
-                    Spacer()
-
+                ScrollView {
                     VStack(spacing: 16) {
-                        dashboardNav("Open Jobs", icon: "list.bullet.rectangle", destination: OpenJobsView())
-                        dashboardNav("Problem Areas", icon: "exclamationmark.triangle.fill", destination: ProblemAreasView())
-                        dashboardNav("Shift Handover", icon: "arrow.left.arrow.right", destination: ShiftHandoverView())
-                        dashboardNav("CWO Options", icon: "doc.text.magnifyingglass", destination: CWOAcceptanceView())
-                        dashboardNav("Assign Shifts", icon: "person.crop.circle.badge.clock", destination: AssignShiftsView())
+                        ActionCard(iconName: "doc.text.fill", title: "Report Breakdown") {
+                            // Navigate to ReportBreakdownView()
+                        }
+                        ActionCard(iconName: "cube.box.fill", title: "Check Stock") {}
+                        ActionCard(iconName: "book.fill", title: "Fault Trees & Manuals") {}
+                        ActionCard(iconName: "list.bullet.rectangle", title: "Open Jobs") {}
+                        ActionCard(iconName: "arrow.2.circlepath.circle.fill", title: "Shift Handover") {}
+                        ActionCard(iconName: "doc.badge.gearshape", title: "Planned Maintenance") {}
+                        ActionCard(iconName: "calendar.badge.plus", title: "CWO Creation") {}
                     }
-
-                    Spacer()
+                    .padding()
                 }
-                .padding()
             }
         }
-    }
-
-    private var header: some View {
-        HStack {
-            Button(action: { dismiss() }) {
-                Image(systemName: "arrow.left")
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.blue)
-                    .clipShape(Circle())
-            }
-
-            Spacer()
-
-            NavigationLink(destination: HomeView()) {
-                Image(systemName: "house.fill")
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.blue)
-                    .clipShape(Circle())
-            }
-        }
-        .padding(.horizontal)
-        .padding(.top)
-    }
-
-    private func dashboardNav<T: View>(_ title: String, icon: String, destination: T) -> some View {
-        NavigationLink(destination: destination) {
-            HStack {
-                Image(systemName: icon)
-                Text(title)
-            }
-            .font(.headline)
-            .foregroundColor(.white)
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(Color.blue)
-            .cornerRadius(12)
-        }
-        .padding(.horizontal)
     }
 }
