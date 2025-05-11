@@ -9,28 +9,20 @@ struct TopNavBar: View {
         HStack {
             Button(action: onBack) {
                 Image(systemName: "arrow.left")
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Circle().fill(Color.blue))
             }
 
             Spacer()
 
             Text(title)
-                .font(.headline)
-                .foregroundColor(.white)
+                .font(.title2)
+                .bold()
 
             Spacer()
 
             Button(action: onHome) {
                 Image(systemName: "house.fill")
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Circle().fill(Color.blue))
             }
         }
-        .padding(.horizontal)
+        .padding()
     }
 }
