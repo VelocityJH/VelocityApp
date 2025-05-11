@@ -6,24 +6,28 @@ struct HomeView: View {
         NavigationStack {
             ZStack {
                 StandardBackground()
+
                 VStack(spacing: 40) {
                     AppLogo()
 
                     VStack(spacing: 20) {
-                        NavigationLink(destination: MaintenanceDashboardView()) {
-                            PrimaryButtonStyle(label: "Maintenance", color: .blue)
+                        NavigationLink("Maintenance") {
+                            MaintenanceDashboardView()
                         }
 
-                        NavigationLink(destination: ManagerDashboardView()) {
-                            PrimaryButtonStyle(label: "Manager Mode", color: .blue)
+                        NavigationLink("Manager Mode") {
+                            ManagerDashboardView()
                         }
 
-                        NavigationLink(destination: AdminDashboardView()) {
-                            PrimaryButtonStyle(label: "Admin", color: .blue)
+                        NavigationLink("Admin") {
+                            AdminDashboardView()
                         }
                     }
-                    .padding(.horizontal)
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, 32)
                 }
+                .padding(.top, 40)
             }
         }
     }
