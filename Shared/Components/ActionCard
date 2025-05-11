@@ -1,29 +1,27 @@
 import SwiftUI
 
 struct ActionCard: View {
-    let iconName: String
-    let title: String
-    let action: () -> Void
+    var iconName: String
+    var title: String
+    var action: () -> Void
 
     var body: some View {
         Button(action: action) {
             VStack(spacing: 12) {
                 Image(systemName: iconName)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 48, height: 48)
+                    .font(.system(size: 32, weight: .semibold))
                     .foregroundColor(.blue)
 
                 Text(title)
                     .font(.headline)
-                    .multilineTextAlignment(.center)
                     .foregroundColor(.blue)
+                    .multilineTextAlignment(.center)
             }
-            .frame(width: 250, height: 250)
+            .frame(maxWidth: .infinity, minHeight: 130)
+            .padding()
             .background(Color.white)
             .cornerRadius(16)
-            .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
+            .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 4)
         }
-        .buttonStyle(PlainButtonStyle())
     }
 }
