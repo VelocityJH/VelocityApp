@@ -3,39 +3,34 @@ import SwiftUI
 struct NavigationHeader: View {
     var title: String
     var onBack: () -> Void
-    var onHome: (() -> Void)? = nil
+    var onHome: () -> Void
 
     var body: some View {
-        HStack {
-            Button(action: onBack) {
-                Image(systemName: "arrow.left")
-                    .font(.title2)
-                    .foregroundColor(.white)
-            }
+        VStack(spacing: 16) {
+            HStack {
+                Button(action: onBack) {
+                    Image(systemName: "arrow.left")
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(Color.blue)
+                        .clipShape(Circle())
+                }
 
-            Spacer()
+                Spacer()
 
-            Text(title)
-                .font(.headline)
-                .foregroundColor(.white)
-
-            Spacer()
-
-            if let onHome = onHome {
                 Button(action: onHome) {
                     Image(systemName: "house.fill")
-                        .font(.title2)
                         .foregroundColor(.white)
+                        .padding()
+                        .background(Color.blue)
+                        .clipShape(Circle())
                 }
-            } else {
-                // Keeps title centered even if no home button
-                Image(systemName: "house.fill")
-                    .opacity(0)
-                    .font(.title2)
             }
+            .padding(.horizontal)
+
+            Text(title)
+                .font(.title2)
+                .foregroundColor(.white)
         }
-        .padding()
-        .background(Color.blue)
-        .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 }
