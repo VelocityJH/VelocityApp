@@ -7,18 +7,23 @@ struct ActionCard: View {
 
     var body: some View {
         Button(action: action) {
-            HStack {
+            VStack(spacing: 12) {
                 Image(systemName: iconName)
-                    .font(.title)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 48, height: 48)
+                    .foregroundColor(.blue)
+
                 Text(title)
-                    .fontWeight(.semibold)
+                    .font(.headline)
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(.blue)
             }
-            .frame(maxWidth: .infinity)
-            .padding()
+            .frame(width: 250, height: 250)
             .background(Color.white)
-            .foregroundColor(.blue)
-            .cornerRadius(10)
-            .shadow(radius: 2)
+            .cornerRadius(16)
+            .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
         }
+        .buttonStyle(PlainButtonStyle())
     }
 }
