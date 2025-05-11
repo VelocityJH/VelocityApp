@@ -3,14 +3,14 @@ import SwiftUI
 struct NavigationHeader: View {
     var title: String
     var onBack: () -> Void
-    var onHome: () -> Void = {}
+    var onHome: (() -> Void)? = nil
 
     var body: some View {
         HStack {
             Button(action: onBack) {
                 Image(systemName: "arrow.left")
+                    .font(.title2)
                     .foregroundColor(.white)
-                    .padding()
             }
 
             Spacer()
@@ -21,13 +21,21 @@ struct NavigationHeader: View {
 
             Spacer()
 
-            Button(action: onHome) {
+            if let onHome = onHome {
+                Button(action: onHome) {
+                    Image(systemName: "house.fill")
+                        .font(.title2)
+                        .foregroundColor(.white)
+                }
+            } else {
+                // Keeps title centered even if no home button
                 Image(systemName: "house.fill")
-                    .foregroundColor(.white)
-                    .padding()
+                    .opacity(0)
+                    .font(.title2)
             }
         }
-        .padding(.horizontal)
+        .padding()
         .background(Color.blue)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 }
