@@ -14,8 +14,7 @@ struct MaintenanceDashboardView: View {
 
             ScrollView {
                 VStack(spacing: 20) {
-                    // Offset so scroll doesn't overlap nav bar
-                    Color.clear.frame(height: 80)
+                    TopNavBar(onHome: { dismiss() })
 
                     Text("Maintenance")
                         .font(.title2)
@@ -43,20 +42,12 @@ struct MaintenanceDashboardView: View {
                         ActionCard(iconName: "doc.badge.gearshape", title: "Planned Maintenance") {}
                             .frame(width: 250, height: 250)
                     }
-                    .frame(maxWidth: .infinity)
                     .padding(.horizontal)
                     .padding(.bottom, 40)
                 }
-                .padding(.top)
-            }
-
-            // Floating nav bar
-            VStack {
-                TopNavBar(onHome: { dismiss() })
-                Spacer()
+                .padding()
             }
         }
-        .ignoresSafeArea(edges: .top)
     }
 }
 
