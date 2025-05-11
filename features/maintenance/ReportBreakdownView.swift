@@ -1,16 +1,14 @@
 import SwiftUI
-import PhotosUI
 
 struct ReportBreakdownView: View {
     @Environment(\.dismiss) var dismiss
 
     @State private var selectedImage: UIImage?
     @State private var showScanner = false
-
-    @State private var zone: String = ""
-    @State private var equipment: String = ""
-    @State private var faultText: String = ""
-    @State private var supportRequired: Bool = false
+    @State private var zone = ""
+    @State private var equipment = ""
+    @State private var faultText = ""
+    @State private var supportRequired = false
 
     var body: some View {
         ZStack {
@@ -24,15 +22,13 @@ struct ReportBreakdownView: View {
 
                 ScrollView {
                     VStack(spacing: 16) {
-
-                        Button {
-                            showScanner = true
-                        } label: {
-                            ActionCard(
-                                iconName: "qrcode.viewfinder",
-                                title: "Scan Area"
-                            )
-                        }
+                        ActionCard(
+                            iconName: "qrcode.viewfinder",
+                            title: "Scan Area",
+                            action: {
+                                showScanner = true
+                            }
+                        )
 
                         InputField(placeholder: "Zone", text: $zone)
                         InputField(placeholder: "Equipment", text: $equipment)
@@ -46,19 +42,26 @@ struct ReportBreakdownView: View {
                         }
 
                         PhotoPicker(image: $selectedImage)
-
                         InputField(placeholder: "Fault Summary", text: $faultText)
 
                         Toggle("Support Required", isOn: $supportRequired)
                             .padding(.horizontal)
 
                         Button("Submit Report") {
-                            // hook up with NotificationManager & nav later
+                            // hook up with NotificationManager + nav
                         }
                         .buttonStyle(.borderedProminent)
                     }
                     .padding()
                 }
+            }
+        }
+        .fullScreenCover(isPresented: $showScanner) {
+            QRScannerView { result in
+                if let code = result {
+                    zone = code
+                }
+                showScanner = false
             }
         }
     }
