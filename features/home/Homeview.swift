@@ -1,12 +1,11 @@
+// Features/Home/HomeView.swift
 import SwiftUI
 
 struct HomeView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color("AppBackground")
-                    .ignoresSafeArea()
-
+                StandardBackground()
                 VStack(spacing: 40) {
                     AppLogo()
 
@@ -23,15 +22,8 @@ struct HomeView: View {
                             PrimaryButtonStyle(label: "Admin", color: .blue)
                         }
                     }
-
-                    Spacer()
-
-                    Button("Log Out") {
-                        // logout logic
-                    }
-                    .foregroundColor(.white.opacity(0.7))
+                    .padding(.horizontal)
                 }
-                .padding(.horizontal)
             }
         }
     }
