@@ -17,32 +17,28 @@ struct ReportBreakdownView: View {
                     onHome: { dismiss() }
                 )
 
-                ActionCard(
-                    iconName: "qrcode.viewfinder",
-                    title: "Scan Area",
-                    action: { /* Placeholder for QR logic */ }
-                )
+                VStack(spacing: 16) {
+                    TextField("Zone", text: $zone)
+                        .textFieldStyle(.roundedBorder)
 
-                ActionCard(
-                    iconName: "camera.viewfinder",
-                    title: "Upload Image",
-                    action: { /* Placeholder for OCR logic */ }
-                )
+                    TextField("Equipment", text: $equipment)
+                        .textFieldStyle(.roundedBorder)
 
-                InputField(placeholder: "Zone", text: $zone)
-                InputField(placeholder: "Equipment", text: $equipment)
-                InputField(placeholder: "Fault Summary", text: $faultText)
+                    TextField("Fault Summary", text: $faultText)
+                        .textFieldStyle(.roundedBorder)
 
-                Toggle("Support Required", isOn: $supportRequired)
-                    .padding(.horizontal)
+                    Toggle("Support Required", isOn: $supportRequired)
+                }
+                .padding()
 
-                Button("Submit Report") {
-                    // Submission logic stub
+                Button("Submit Breakdown") {
+                    // Submit stub
                 }
                 .buttonStyle(.borderedProminent)
+                .padding(.bottom, 40)
             }
             .padding()
         }
-        .background(Color("AppBackground").ignoresSafeArea())
+        .background(StandardBackground())
     }
 }
