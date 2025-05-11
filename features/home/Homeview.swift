@@ -4,40 +4,34 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color("AppBackground").ignoresSafeArea()
+                Color("AppBackground")
+                    .ignoresSafeArea()
 
                 VStack(spacing: 40) {
-                    Spacer()
-
-                    // Logo placeholder
-                    Image("VelocityLogo")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 120, height: 120)
+                    AppLogo()
 
                     VStack(spacing: 20) {
                         NavigationLink(destination: MaintenanceDashboardView()) {
-                            PrimaryButton(label: "Maintenance", color: .blue) {}
+                            PrimaryButtonStyle(label: "Maintenance", color: .blue)
                         }
 
                         NavigationLink(destination: ManagerDashboardView()) {
-                            PrimaryButton(label: "Manager Mode", color: .blue) {}
+                            PrimaryButtonStyle(label: "Manager Mode", color: .blue)
                         }
 
-                        NavigationLink(destination: AdminView()) {
-                            PrimaryButton(label: "Admin", color: .blue) {}
+                        NavigationLink(destination: AdminDashboardView()) {
+                            PrimaryButtonStyle(label: "Admin", color: .blue)
                         }
                     }
-                    .padding(.horizontal)
 
                     Spacer()
 
                     Button("Log Out") {
-                        // Add logout logic here
+                        // logout logic
                     }
                     .foregroundColor(.white.opacity(0.7))
-                    .padding(.bottom)
                 }
+                .padding(.horizontal)
             }
         }
     }
