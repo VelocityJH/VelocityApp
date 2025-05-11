@@ -1,15 +1,15 @@
-// /Components/TopNavBar.swift
-
 import SwiftUI
 
 struct TopNavBar: View {
-    @Environment(\.dismiss) private var dismiss
+    var title: String
+    var onBack: () -> Void
     var onHome: () -> Void
 
     var body: some View {
         HStack {
-            Button(action: { dismiss() }) {
+            Button(action: onBack) {
                 Image(systemName: "arrow.left")
+                    .font(.system(size: 20, weight: .bold))
                     .foregroundColor(.white)
                     .padding()
                     .background(Circle().fill(Color.blue))
@@ -17,8 +17,15 @@ struct TopNavBar: View {
 
             Spacer()
 
-            Button(action: { onHome() }) {
+            Text(title)
+                .font(.headline)
+                .foregroundColor(.white)
+
+            Spacer()
+
+            Button(action: onHome) {
                 Image(systemName: "house.fill")
+                    .font(.system(size: 20, weight: .bold))
                     .foregroundColor(.white)
                     .padding()
                     .background(Circle().fill(Color.blue))
