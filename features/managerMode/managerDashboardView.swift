@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct MaintenanceDashboardView: View {
+struct ManagerDashboardView: View {
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
@@ -8,19 +8,29 @@ struct MaintenanceDashboardView: View {
             StandardBackground()
 
             VStack(spacing: 20) {
-                NavigationHeader(title: "Maintenance", onBack: { dismiss() })
+                NavigationHeader(title: "Manager Mode", onBack: { dismiss() })
 
                 ScrollView {
                     VStack(spacing: 16) {
-                        ActionCard(iconName: "doc.text.fill", title: "Report Breakdown") {
-                            // Navigate to ReportBreakdownView()
+                        ActionCard(iconName: "list.bullet.clipboard", title: "Open Jobs") {
+                            // Navigate to OpenJobsView()
                         }
-                        ActionCard(iconName: "cube.box.fill", title: "Check Stock") {}
-                        ActionCard(iconName: "book.fill", title: "Fault Trees & Manuals") {}
-                        ActionCard(iconName: "list.bullet.rectangle", title: "Open Jobs") {}
-                        ActionCard(iconName: "arrow.2.circlepath.circle.fill", title: "Shift Handover") {}
-                        ActionCard(iconName: "doc.badge.gearshape", title: "Planned Maintenance") {}
-                        ActionCard(iconName: "calendar.badge.plus", title: "CWO Creation") {}
+
+                        ActionCard(iconName: "flame.fill", title: "Problem Areas") {
+                            // Placeholder or future view
+                        }
+
+                        ActionCard(iconName: "arrow.triangle.2.circlepath", title: "Shift Handover") {
+                            // Navigate to ShiftHandoverView()
+                        }
+
+                        ActionCard(iconName: "doc.plaintext", title: "CWO Options") {
+                            // Navigate to CWODashboardView()
+                        }
+
+                        ActionCard(iconName: "person.2.badge.gearshape", title: "Assign Shifts") {
+                            // Navigate to AssignShiftView()
+                        }
                     }
                     .padding()
                 }
