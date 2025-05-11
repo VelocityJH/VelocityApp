@@ -1,27 +1,24 @@
-import SwiftUI
-
 struct ActionCard: View {
     var iconName: String
     var title: String
-    var action: () -> Void
+    var action: (() -> Void)? = nil  // Make optional
 
     var body: some View {
-        Button(action: action) {
-            VStack(spacing: 12) {
+        Button(action: {
+            action?()  // Only triggers if not nil
+        }) {
+            VStack(spacing: 8) {
                 Image(systemName: iconName)
-                    .font(.system(size: 32, weight: .semibold))
-                    .foregroundColor(.blue)
-
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 40, height: 40)
                 Text(title)
-                    .font(.headline)
-                    .foregroundColor(.blue)
                     .multilineTextAlignment(.center)
             }
-            .frame(maxWidth: .infinity, minHeight: 130)
-            .padding()
+            .frame(width: 150, height: 150)
             .background(Color.white)
             .cornerRadius(16)
-            .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 4)
         }
+        .disabled(action == nil) // Let NavigationLink handle taps
     }
 }
