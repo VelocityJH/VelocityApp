@@ -1,6 +1,5 @@
-// Features/ReportBreakdown/ReportBreakdownView.swift
-
 import SwiftUI
+import PhotosUI
 
 struct ReportBreakdownView: View {
     @Environment(\.dismiss) var dismiss
@@ -8,28 +7,55 @@ struct ReportBreakdownView: View {
     @State private var zone: String = ""
     @State private var equipment: String = ""
     @State private var faultSummary: String = ""
-    @State private var selectedImage: UIImage?
+    @State private var selectedImage: PhotosPickerItem? = nil
+    @State private var imageData: Data? = nil
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 16) {
+            VStack(spacing: 20) {
                 TopNavBar(
                     title: "Report Breakdown",
                     onBack: { dismiss() },
-                    onHome: { dismiss() } // Replace with your routing logic
+                    onHome: { dismiss() } // Update when routing logic is ready
                 )
 
-                InputField(placeholder: "Zone", text: $zone)
-                InputField(placeholder: "Equipment", text: $equipment)
-                InputField(placeholder: "Fault Summary", text: $faultSummary)
+                HStack(spacing: 16) {
+                    Button("Scan Area") {
+                        // Placeholder for QR Scanner
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.orange)
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
 
-                PhotoPicker(image: $selectedImage)
+                    PhotosPicker(selection: $selectedImage, matching: .images) {
+                        HStack {
+                            Image(systemName: "camera")
+                            Text("Capture Fault")
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.purple)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                    }
+                }
+
+                Group {
+                    InputField(placeholder: "Enter Zone/Area", text: $zone)
+                    InputField(placeholder: "Enter Equipment", text: $equipment)
+                    InputField(placeholder: "Enter Fault Summary", text: $faultSummary)
+                }
 
                 Button("Submit Report") {
-                    // handle submit logic
+                    // TODO: Hook up with submission logic
                 }
-                .buttonStyle(.borderedProminent)
-                .padding(.top)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.green)
+                .foregroundColor(.white)
+                .cornerRadius(12)
             }
             .padding()
         }
