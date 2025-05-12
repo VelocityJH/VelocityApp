@@ -1,0 +1,56 @@
+import SwiftUI
+
+struct BreakdownControlView: View {
+    @Environment(\.dismiss) var dismiss
+
+    var body: some View {
+        ZStack {
+            Color("AppBackground").ignoresSafeArea()
+
+            VStack(spacing: 16) {
+                TopNavBar(
+                    title: "Breakdown Control",
+                    onBack: { dismiss() },
+                    onHome: { dismiss() } // Replace with your actual routing logic
+                )
+
+                Button("Complete Job") {
+                    // Action here
+                }
+                .frame(maxWidth: .infinity, minHeight: 50)
+                .background(Color.green)
+                .foregroundColor(.white)
+                .cornerRadius(12)
+
+                Button("Spare Parts") {
+                    // Action here
+                }
+                .frame(maxWidth: .infinity, minHeight: 50)
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(12)
+
+                Button("Fault Trees & Manuals") {
+                    // Action here
+                }
+                .frame(maxWidth: .infinity, minHeight: 50)
+                .background(Color.orange)
+                .foregroundColor(.white)
+                .cornerRadius(12)
+
+                Button("Request Support") {
+                    // Action here
+                }
+                .frame(maxWidth: .infinity, minHeight: 50)
+                .background(Color.purple)
+                .foregroundColor(.white)
+                .cornerRadius(12)
+            }
+            .padding()
+        }
+    }
+}
+
+#Preview {
+    BreakdownControlView()
+}
