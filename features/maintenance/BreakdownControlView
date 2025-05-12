@@ -4,18 +4,16 @@ struct BreakdownControlView: View {
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
-        ZStack {
-            Color("AppBackground").ignoresSafeArea()
-
+        ScrollView {
             VStack(spacing: 16) {
                 TopNavBar(
                     title: "Breakdown Control",
                     onBack: { dismiss() },
-                    onHome: { dismiss() } // Replace with your actual routing logic
+                    onHome: { dismiss() } // Replace with your routing logic
                 )
 
                 Button("Complete Job") {
-                    // Action here
+                    // TODO
                 }
                 .frame(maxWidth: .infinity, minHeight: 50)
                 .background(Color.green)
@@ -23,7 +21,7 @@ struct BreakdownControlView: View {
                 .cornerRadius(12)
 
                 Button("Spare Parts") {
-                    // Action here
+                    // TODO
                 }
                 .frame(maxWidth: .infinity, minHeight: 50)
                 .background(Color.blue)
@@ -31,7 +29,7 @@ struct BreakdownControlView: View {
                 .cornerRadius(12)
 
                 Button("Fault Trees & Manuals") {
-                    // Action here
+                    // TODO
                 }
                 .frame(maxWidth: .infinity, minHeight: 50)
                 .background(Color.orange)
@@ -39,7 +37,7 @@ struct BreakdownControlView: View {
                 .cornerRadius(12)
 
                 Button("Request Support") {
-                    // Action here
+                    // TODO
                 }
                 .frame(maxWidth: .infinity, minHeight: 50)
                 .background(Color.purple)
@@ -48,6 +46,7 @@ struct BreakdownControlView: View {
             }
             .padding()
         }
+        .background(Color("AppBackground").ignoresSafeArea())
     }
 }
 
