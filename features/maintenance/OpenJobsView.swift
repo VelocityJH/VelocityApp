@@ -1,88 +1,57 @@
-// Features/OpenJobs/OpenJobsView.swift
-
 import SwiftUI
 
 struct OpenJobsView: View {
-    @ObservedObject var breakdownManager = BreakdownManager.shared
-    @Environment(\.dismiss) private var dismiss
-    @State private var expandedBreakdownID: UUID?
+    @Environment(\.dismiss) var dismiss
+    @State private var openBreakdowns: [Breakdown] = [
+        Breakdown(id: UUID(), zone: "Zone A", downtime: 10, submittedBy: "John Doe", status: "Open")
+    ]
 
     var body: some View {
-        ZStack {
-            Color(red: 0.00235, green: 0.1843, blue: 0.2941).ignoresSafeArea()
+        ScrollView {
+            VStack(spacing: 16) {
+                TopNavBar(
+                    title: "Open Breakdowns",
+                    onBack: { dismiss() },
+                    onHome: { dismiss() } // Replace with router.popToRoot() if routing
+                )
 
-            VStack {
-                header
-                ScrollView {
-                    VStack(spacing: 12) {
-                        ForEach(breakdownManager.openBreakdowns.filter { $0.status == .open }) { breakdown in
-                            jobCard(breakdown)
+                ForEach(openBreakdowns) { breakdown in
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Zone: \(breakdown.zone)")
+                            .font(.headline)
+                        Text("Downtime: \(breakdown.downtime) mins")
+                        Text("Reported by: \(breakdown.submittedBy)")
+                        Text("Status: \(breakdown.status)")
+                        NavigationLink(destination: JobDetailView(breakdown: breakdown)) {
+                            Text("Manage Job")
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color.green)
+                                .cornerRadius(8)
                         }
                     }
+                    .padding()
+                    .background(Color.green.opacity(0.2))
+                    .cornerRadius(12)
                     .padding(.horizontal)
                 }
             }
         }
+        .background(Color("AppBackground").ignoresSafeArea())
     }
+}
 
-    private var header: some View {
-        HStack {
-            Button(action: { dismiss() }) {
-                Image(systemName: "arrow.left")
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.blue)
-                    .clipShape(Circle())
-            }
-            Spacer()
-            NavigationLink(destination: HomeView()) {
-                Image(systemName: "house.fill")
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.blue)
-                    .clipShape(Circle())
-            }
-        }
-        .padding(.horizontal)
-        .padding(.top)
-    }
+struct Breakdown: Identifiable {
+    let id: UUID
+    let zone: String
+    let downtime: Int
+    let submittedBy: String
+    let status: String
+}
 
-    private func jobCard(_ breakdown: Breakdown) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Zone: \(breakdown.zone)")
-            Text("Equipment: \(breakdown.equipment)")
-
-            if expandedBreakdownID == breakdown.id {
-                Text("Reported by: \(breakdown.reporterName)")
-                Text("Time: \(formattedDate(breakdown.startTime))")
-
-                HStack {
-                    Button("Join Job") {
-                        BreakdownManager.shared.addEngineer(to: breakdown, engineerName: UserManager.shared.username)
-                    }
-                    .buttonStyle(.borderedProminent)
-
-                    NavigationLink("More Info", destination: BreakdownDetailView(breakdown: breakdown))
-                        .buttonStyle(.bordered)
-                }
-            }
-
-            Button(action: {
-                expandedBreakdownID = expandedBreakdownID == breakdown.id ? nil : breakdown.id
-            }) {
-                Text(expandedBreakdownID == breakdown.id ? "Collapse" : "Expand")
-                    .font(.caption)
-            }
-        }
-        .padding()
-        .background(Color.white)
-        .cornerRadius(10)
-    }
-
-    private func formattedDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        formatter.timeStyle = .short
-        return formatter.string(from: date)
+struct OpenJobsView_Previews: PreviewProvider {
+    static var previews: some View {
+        OpenJobsView()
     }
 }
