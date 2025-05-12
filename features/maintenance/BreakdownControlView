@@ -4,49 +4,60 @@ struct BreakdownControlView: View {
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                TopNavBar(
-                    title: "Breakdown Control",
-                    onBack: { dismiss() },
-                    onHome: { dismiss() } // Replace with your routing logic
-                )
+        ZStack {
+            Color("AppBackground").ignoresSafeArea()
 
-                Button("Complete Job") {
-                    // TODO
-                }
-                .frame(maxWidth: .infinity, minHeight: 50)
-                .background(Color.green)
-                .foregroundColor(.white)
-                .cornerRadius(12)
+            ScrollView {
+                VStack(spacing: 20) {
+                    TopNavBar(
+                        title: "Breakdown Control",
+                        onBack: { dismiss() },
+                        onHome: { dismiss() } // Replace with actual navigation
+                    )
 
-                Button("Spare Parts") {
-                    // TODO
-                }
-                .frame(maxWidth: .infinity, minHeight: 50)
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(12)
+                    Button("Complete Job") {
+                        // Action here
+                    }
+                    .frame(height: 60)
+                    .frame(maxWidth: .infinity)
+                    .background(Color.green)
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                    .padding(.horizontal)
 
-                Button("Fault Trees & Manuals") {
-                    // TODO
-                }
-                .frame(maxWidth: .infinity, minHeight: 50)
-                .background(Color.orange)
-                .foregroundColor(.white)
-                .cornerRadius(12)
+                    Button("Spare Parts") {
+                        // Action here
+                    }
+                    .frame(height: 60)
+                    .frame(maxWidth: .infinity)
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                    .padding(.horizontal)
 
-                Button("Request Support") {
-                    // TODO
+                    Button("Fault Trees & Manuals") {
+                        // Action here
+                    }
+                    .frame(height: 60)
+                    .frame(maxWidth: .infinity)
+                    .background(Color.orange)
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                    .padding(.horizontal)
+
+                    Button("Request Support") {
+                        // Action here
+                    }
+                    .frame(height: 60)
+                    .frame(maxWidth: .infinity)
+                    .background(Color.purple)
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                    .padding(.horizontal)
                 }
-                .frame(maxWidth: .infinity, minHeight: 50)
-                .background(Color.purple)
-                .foregroundColor(.white)
-                .cornerRadius(12)
+                .padding(.top, 16)
             }
-            .padding()
         }
-        .background(Color("AppBackground").ignoresSafeArea())
     }
 }
 
