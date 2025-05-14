@@ -1,47 +1,38 @@
 import SwiftUI
 
 struct PartDetailView: View {
-    let part: SparePart
-    @Environment(\.dismiss) private var dismiss
-
+    @Binding var inventory: [Part]
+    let part: Part
+    
     var body: some View {
-        ZStack {
-            Color(red: 0.0235, green: 0.1843, blue: 0.2941).ignoresSafeArea()
-
-            VStack(spacing: 20) {
-                HStack {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "arrow.left")
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.blue)
-                            .clipShape(Circle())
-                    }
-                    Spacer()
-                    NavigationLink(destination: HomeView()) {
-                        Image(systemName: "house.fill")
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.blue)
-                            .clipShape(Circle())
-                    }
-                }
-                .padding(.horizontal)
-
-                Text(part.name)
-                    .font(.title)
-                    .foregroundColor(.white)
-
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Part Number: \(part.partNumber)")
-                    Text("Location: \(part.location)")
-                    Text("Stock: \(part.stock)")
-                }
-                .foregroundColor(.white)
-
-                Spacer()
+        VStack(spacing: 16) {
+            if let imageName = part.imageName {
+                Image(imageName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 160)
+                    .foregroundColor(.gray)
             }
-            .padding()
+
+            Text("🧾 Name: \(part.name)")
+            Text("🔢 Number: \(part.number)")
+            Text("📍 Location: \(part.location)")
+            Text("📦 Stock: \(part.stock)")
+
+            Button("📤 Take Part") {
+                if let index = inventory.firstIndex(where: { $0.id == part.id }) {
+                    if inventory[index].stock > 0 {
+                        inventory[index].stock -= 1
+                        print("Message to manager: Part \(inventory[index].number) taken. Stock now \(inventory[index].stock)")
+                    }
+                }
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(.blue)
+
+            Spacer()
         }
+        .padding()
+        .presentationDetents([.medium])
     }
 }
