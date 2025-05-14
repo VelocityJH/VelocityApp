@@ -7,7 +7,6 @@ struct OpenJobsView: View {
 
     @State private var openBreakdowns: [Breakdown] = [
         Breakdown(
-            id: UUID(),
             zone: "Zone A",
             equipment: "Conveyor 5",
             faultSummary: "Motor fault",
@@ -21,11 +20,11 @@ struct OpenJobsView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                TopNavBar(
-                    title: "Open Breakdowns",
-                    onBack: { dismiss() },
-                    onHome: { dismiss() } // Replace with .popToRoot if routing
-                )
+                //TopNavBar(
+                 //   title: "Open Breakdowns",
+                 //   onBack: { dismiss() },
+                 //   onHome: { dismiss() } // Replace with .popToRoot if routing
+                //)
 
                 ForEach(openBreakdowns) { breakdown in
                     VStack(alignment: .leading, spacing: 6) {
@@ -45,7 +44,9 @@ struct OpenJobsView: View {
                 }
             }
         }
-        .background(Color("AppBackground").ignoresSafeArea())
+        background(StandardBackgroundView())
+        .navigationBarBackButtonHidden(true)
+        .navigationBarHidden(true)
     }
 }
 
