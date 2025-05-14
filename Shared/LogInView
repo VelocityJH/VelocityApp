@@ -3,6 +3,8 @@ import SwiftUI
 struct LoginView: View {
     @ObservedObject var session = UserSession.shared
     @State private var username: String = ""
+    @State private var password: String = ""
+    @State private var showError = false
 
     var body: some View {
         VStack(spacing: 20) {
@@ -10,20 +12,38 @@ struct LoginView: View {
                 .font(.largeTitle)
                 .bold()
 
-            TextField("Enter your name", text: $username)
+            TextField("Username", text: $username)
                 .textFieldStyle(.roundedBorder)
-                .padding(.horizontal)
                 .foregroundColor(.black)
+                .padding(.horizontal)
+
+            SecureField("Password", text: $password)
+                .textFieldStyle(.roundedBorder)
+                .foregroundColor(.black)
+                .padding(.horizontal)
+
+            if showError {
+                Text("Invalid login").foregroundColor(.red)
+            }
 
             Button("Login") {
-                session.username = username
-                session.isLoggedIn = true
+                if validateCredentials() {
+                    session.username = username
+                    session.isLoggedIn = true
+                } else {
+                    showError = true
+                }
             }
             .buttonStyle(.borderedProminent)
-            .disabled(username.isEmpty)
+            .disabled(username.isEmpty || password.isEmpty)
         }
         .padding()
         .background(StandardBackgroundView())
+    }
+
+    func validateCredentials() -> Bool {
+        // Hardcoded login for MVP (replace with secure logic later)
+        return username == "admin" && password == "password123"
     }
 }
 
