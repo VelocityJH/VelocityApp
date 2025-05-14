@@ -1,49 +1,50 @@
 import SwiftUI
 
 struct LoginView: View {
-    @State private var username = ""
-    @State private var password = ""
+    @State private var username: String = ""
+    @State private var password: String = ""
+    @State private var loginFailed = false
     @State private var showHome = false
 
     var body: some View {
-        ZStack {
-            Color("AppBackground")
-                .ignoresSafeArea()
-
-            VStack(spacing: 20) {
+        NavigationStack {
+            VStack(spacing: 16) {
                 Text("Welcome to Velocity")
-                    .font(.title)
+                    .font(.title2)
                     .foregroundColor(.white)
 
-                VStack(spacing: 16) {
-                    InputField(placeholder: "Username", text: $username)
-                    SecureField("Password", text: $password)
-                        .padding()
-                        .frame(height: 50)
-                        .background(Color.white)
-                        .cornerRadius(10)
+                TextField("Username", text: $username)
+                    .textFieldStyle(.roundedBorder)
+
+                SecureField("Password", text: $password)
+                    .textFieldStyle(.roundedBorder)
+
+                Button("Log In") {
+                    handleLogin()
+                }
+                .buttonStyle(.borderedProminent)
+
+                if loginFailed {
+                    Text("Login failed, try again.")
+                        .foregroundColor(.red)
                 }
 
-                Button(action: handleLogin) {
-                    Text("Log In")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.green)
-                        .foregroundColor(.white)
-                        .cornerRadius(12)
-                }
-                .padding(.horizontal)
+                // Navigation trigger
+                NavigationLink("", destination: HomeView(), isActive: $showHome)
+                    .hidden()
             }
             .padding()
-            .navigationDestination(isPresented: $showHome) {
-                HomeView()
-            }
+            .background(Color("AppBackground").ignoresSafeArea())
         }
     }
 
     func handleLogin() {
-        guard !username.isEmpty, !password.isEmpty else { return }
-        showHome = true
+        if username.lowercased() == "james" && password == "admin123" {
+            loginFailed = false
+            showHome = true
+        } else {
+            loginFailed = true
+        }
     }
 }
 
