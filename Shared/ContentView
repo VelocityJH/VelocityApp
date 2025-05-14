@@ -1,0 +1,17 @@
+import SwiftUI
+
+struct ContentView: View {
+    @ObservedObject var session = UserSession.shared
+
+    var body: some View {
+        if session.isLoggedIn {
+            HomeView()
+        } else {
+            LoginView()
+        }
+    }
+}
+
+#Preview {
+    ContentView()
+}
