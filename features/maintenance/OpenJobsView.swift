@@ -64,7 +64,7 @@ struct BreakdownDetailSheet: View {
             Spacer()
 
             Button("➕ Join Job") {
-                print("🛠 User joined the job for \(breakdown.equipment)")
+                BreakdownManager.shared.joinJob(breakdown: breakdown)
             }
             .padding()
             .frame(maxWidth: .infinity)
@@ -91,8 +91,4 @@ struct BreakdownDetailSheet: View {
         .padding()
         .presentationDetents([.medium, .large])
     }
-}
-
-#Preview {
-    OpenJobsView()
 }
