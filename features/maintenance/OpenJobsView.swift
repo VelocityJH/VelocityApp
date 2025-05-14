@@ -6,6 +6,7 @@ struct OpenJobsView: View {
 
     @State private var selectedBreakdown: Breakdown?
     @State private var showDetail = false
+    @State private var navigateToControl = false
 
     var body: some View {
         ScrollView {
@@ -20,11 +21,13 @@ struct OpenJobsView: View {
                     Button(action: {
                         selectedBreakdown = breakdown
                         showDetail = true
+                        navigateToControl = true
                     }) {
                         VStack(alignment: .leading, spacing: 6) {
                             Text("📍 Zone: \(breakdown.zone)").bold()
                             Text("🛠 Equipment: \(breakdown.equipment)")
                             Text("⚠️ Status: \(breakdown.status)")
+                            Text("⏳ Downtime \(breakdown.downtime) mins")
                         }
                         .padding()
                         .background(Color.green.opacity(0.3))
@@ -63,17 +66,31 @@ struct BreakdownDetailSheet: View {
 
             Button("➕ Join Job") {
                 print("🛠 User joined the job for \(breakdown.equipment)")
+
+                }
             }
             .padding()
             .frame(maxWidth: .infinity)
             .background(Color.blue)
             .foregroundColor(.white)
             .cornerRadius(10)
+        
+            NavigationLink(destination: BreakdownControlView(breakdown: breakdown),
+                       isActive: $navigateToControl) {
+            EmptyView()
+            }
+            Button("🔧 Control Breakdown") {
+            navigateToControl = true
+           }
+          .padding()
+          .frame(maxWidth: .infinity)
+          .background(Color.orange)
+          .foregroundColor(.white)
+          .cornerRadius(10)
         }
         .padding()
         .presentationDetents([.medium, .large])
     }
-}
 
 #Preview {
     OpenJobsView()
