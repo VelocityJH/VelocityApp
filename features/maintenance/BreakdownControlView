@@ -1,5 +1,4 @@
-// Features/Maintenance/BreakdownControlView.swift
-
+// Features/Breakdown/BreakdownControlView.swift
 import SwiftUI
 
 struct BreakdownControlView: View {
@@ -19,22 +18,8 @@ struct BreakdownControlView: View {
                         onHome: { dismiss() }
                     )
 
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Zone: \(breakdown.zone)").bold()
-                        Text("Equipment: \(breakdown.equipment)")
-                        Text("Summary: \(breakdown.faultSummary)")
-                        Text("Reported by: \(breakdown.submittedBy)")
-                        Text("Status: \(breakdown.status)")
-                        Text("Downtime: \(breakdown.downtime) mins")
-                    }
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.green.opacity(0.3))
-                    .cornerRadius(12)
-                    .padding(.horizontal)
-
                     Button("Complete Job") {
-                        BreakdownManager.shared.completeJob(breakdown: breakdown)
+                        BreakdownManager.shared.completeJob(breakdown)
                         dismiss()
                     }
                     .frame(height: 60)
@@ -45,7 +30,7 @@ struct BreakdownControlView: View {
                     .padding(.horizontal)
 
                     Button("Spare Parts") {
-                        // To be implemented
+                        // Action
                     }
                     .frame(height: 60)
                     .frame(maxWidth: .infinity)
@@ -55,7 +40,7 @@ struct BreakdownControlView: View {
                     .padding(.horizontal)
 
                     Button("Fault Trees & Manuals") {
-                        // To be implemented
+                        // Action
                     }
                     .frame(height: 60)
                     .frame(maxWidth: .infinity)
@@ -65,7 +50,7 @@ struct BreakdownControlView: View {
                     .padding(.horizontal)
 
                     Button("Request Support") {
-                        // To be implemented
+                        // Action
                     }
                     .frame(height: 60)
                     .frame(maxWidth: .infinity)
@@ -80,15 +65,5 @@ struct BreakdownControlView: View {
 }
 
 #Preview {
-    BreakdownControlView(
-        breakdown: Breakdown(
-            zone: "Zone A",
-            equipment: "Pump 1",
-            faultSummary: "Leaking Valve",
-            timeSubmitted: Date(),
-            submittedBy: "James",
-            status: "Open",
-            downtime: 15
-        )
-    )
+    BreakdownControlView(breakdown: Breakdown.mock)
 }
