@@ -4,26 +4,33 @@ import SwiftUI
 final class BreakdownManager: ObservableObject {
     static let shared = BreakdownManager()
 
-    @Published var openBreakdowns: [Breakdown] = [
-        Breakdown(
-            zone: "Zone A",
-            equipment: "Conveyor 5",
-            faultSummary: "Motor fault",
-            timeSubmitted: Date(),
-            submittedBy: "James",
-            status: "Open",
-            downtime: 12
-        ),
-        Breakdown(
-            zone: "Zone B",
-            equipment: "Pump 2",
-            faultSummary: "Leak detected",
-            timeSubmitted: Date(),
-            submittedBy: "Alex",
-            status: "Open",
-            downtime: 8
-        )
-    ]
+    @Published var openBreakdowns: [Breakdown] = []
 
     private init() {}
+
+    func addBreakdown(_ breakdown: Breakdown) {
+        openBreakdowns.append(breakdown)
+    }
+
+    func joinJob(breakdown: Breakdown) {
+        let username = UserManager.shared.username
+        guard !username.isEmpty else { return }
+
+        if let index = openBreakdowns.firstIndex(where: { $0.id == breakdown.id }) {
+            if !openBreakdowns[index].joinedEngineers.contains(username) {
+                openBreakdowns[index].joinedEngineers.append(username)
+            }
+        }
+    }
+
+    func completeJob(breakdown: Breakdown) {
+        let username = UserManager.shared.username
+        guard !username.isEmpty else { return }
+
+        if let index = openBreakdowns.firstIndex(where: { $0.id == breakdown.id }) {
+            openBreakdowns[index].status = "Closed"
+            openBreakdowns[index].endTime = Date()
+            openBreakdowns[index].completedBy = username
+        }
+    }
 }
