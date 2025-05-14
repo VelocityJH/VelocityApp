@@ -1,73 +1,97 @@
 import SwiftUI
-import PhotosUI
 
 struct ReportBreakdownView: View {
     @Environment(\.dismiss) var dismiss
+
     @State private var zone: String = ""
     @State private var equipment: String = ""
     @State private var faultSummary: String = ""
-    @State private var submittedBy: String = ""
-    @ObservedObject var breakdownManager = BreakdownManager.shared
+    @State private var photo: UIImage? = nil
+
+    @State private var navigateToControl = false
+    @State private var newBreakdown: Breakdown? = nil
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                TopNavBar(
-                    title: "Report Breakdown",
-                    onBack: { dismiss() },
-                    onHome: { dismiss() }
-                )
+        NavigationStack {
+            ZStack {
+                Color(red: 3/255, green: 46/255, blue: 73/255)
+                    .ignoresSafeArea()
 
-                HStack(spacing: 16) {
-                    ActionButton(label: "Scan Area", color: .orange, icon: "qrcode.viewfinder") {
-                        // Placeholder for QR
-                    }
-                    ActionButton(label: "Capture Fault", color: .purple, icon: "camera.fill") {
-                        // Placeholder for OCR
-                    }
-                }
+                ScrollView {
+                    VStack(spacing: 20) {
+                        TopNavBar(title: "Report Breakdown", onBack: { dismiss() }, onHome: { dismiss() })
 
-                Group {
-                    TextField("Enter Zone/Area", text: $zone)
-                    TextField("Enter Equipment", text: $equipment)
-                    TextField("Enter Fault Summary", text: $faultSummary)
-                    TextField("Your Name", text: $submittedBy)
-                }
-                .textFieldStyle(.roundedBorder)
-                .foregroundColor(.black)
-                .padding(.horizontal)
+                        // Placeholder QR & Fault capture buttons
+                        HStack(spacing: 12) {
+                            Button("Scan Area QR") {
+                                // TODO: Implement QR
+                            }
+                            .frame(height: 50)
+                            .frame(maxWidth: .infinity)
+                            .background(Color.gray.opacity(0.2))
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
 
-                Button(action: submitBreakdown) {
-                    Text("Submit Report")
-                        .fontWeight(.bold)
+                            Button("Capture Fault") {
+                                // TODO: Implement OCR
+                            }
+                            .frame(height: 50)
+                            .frame(maxWidth: .infinity)
+                            .background(Color.gray.opacity(0.2))
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                        }
+
+                        Group {
+                            TextField("Zone", text: $zone)
+                            TextField("Equipment", text: $equipment)
+                            TextField("Fault Summary", text: $faultSummary, axis: .vertical)
+                        }
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .padding(.horizontal)
+                        .foregroundColor(.black)
+
+                        Button("Submit Breakdown") {
+                            submitBreakdown()
+                        }
+                        .frame(height: 50)
                         .frame(maxWidth: .infinity)
-                        .padding()
                         .background(Color.green)
                         .foregroundColor(.white)
                         .cornerRadius(12)
                         .padding(.horizontal)
+                    }
+                    .padding()
+                }
+
+                // Navigation trigger
+                NavigationLink(destination: {
+                    if let breakdown = newBreakdown {
+                        BreakdownControlView(breakdown: breakdown)
+                    }
+                }, isActive: $navigateToControl) {
+                    EmptyView()
                 }
             }
-            .padding()
         }
-        .background(StandardBackgroundView())
-        .navigationBarBackButtonHidden(true)
-        .navigationBarHidden(true)
     }
 
-    func submitBreakdown() {
-        let newBreakdown = Breakdown(
+    private func submitBreakdown() {
+        let reporter = UserManager.shared.username
+        let breakdown = Breakdown(
             zone: zone,
             equipment: equipment,
             faultSummary: faultSummary,
             timeSubmitted: Date(),
-            submittedBy: submittedBy,
-            status: "Open",
-            downtime: 0
+            submittedBy: reporter,
+            status: "Open"
         )
 
-        breakdownManager.openBreakdowns.append(newBreakdown)
-        dismiss()
+        BreakdownManager.shared.addBreakdown(breakdown)
+        BreakdownManager.shared.joinJob(breakdown: breakdown)
+
+        newBreakdown = breakdown
+        navigateToControl = true
     }
 }
 
