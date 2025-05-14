@@ -4,7 +4,20 @@ import SwiftUI
 final class UserManager: ObservableObject {
     static let shared = UserManager()
 
-    @Published var username: String = "Unknown"
+    @AppStorage("loggedInUsername") var username: String = ""
+    @Published var isLoggedIn: Bool = false
 
-    private init() {}
+    private init() {
+        isLoggedIn = !username.isEmpty
+    }
+
+    func logIn(user: String) {
+        username = user
+        isLoggedIn = true
+    }
+
+    func logOut() {
+        username = ""
+        isLoggedIn = false
+    }
 }
