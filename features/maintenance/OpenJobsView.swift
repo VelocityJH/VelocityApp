@@ -2,7 +2,10 @@ import SwiftUI
 
 struct OpenJobsView: View {
     @Environment(\.dismiss) var dismiss
-    @StateObject private var breakdownManager = BreakdownManager.shared
+    @StateObject var breakdownManager = BreakdownManager.shared
+
+    @State private var selectedBreakdown: Breakdown?
+    @State private var showDetail = false
 
     var body: some View {
         ScrollView {
@@ -14,25 +17,61 @@ struct OpenJobsView: View {
                 )
 
                 ForEach(breakdownManager.openBreakdowns) { breakdown in
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("📍 Zone: \(breakdown.zone)").bold()
-                        Text("🛠 Equipment: \(breakdown.equipment)")
-                        Text("⚠️ Fault: \(breakdown.faultSummary)")
-                        Text("👤 Reported by: \(breakdown.submittedBy)")
-                        Text("⏱ Downtime: \(breakdown.downtime) mins")
-                        Text("📅 Submitted: \(breakdown.timeSubmitted.formatted(.dateTime.hour().minute()))")
-                        Text("🔓 Status: \(breakdown.status)")
+                    Button(action: {
+                        selectedBreakdown = breakdown
+                        showDetail = true
+                    }) {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("📍 Zone: \(breakdown.zone)").bold()
+                            Text("🛠 Equipment: \(breakdown.equipment)")
+                            Text("⚠️ Status: \(breakdown.status)")
+                        }
+                        .padding()
+                        .background(Color.green.opacity(0.3))
+                        .cornerRadius(12)
+                        .padding(.horizontal)
                     }
-                    .padding()
-                    .background(Color.green.opacity(0.3))
-                    .cornerRadius(12)
-                    .padding(.horizontal)
                 }
+            }
+        }
+        .sheet(isPresented: $showDetail) {
+            if let breakdown = selectedBreakdown {
+                BreakdownDetailSheet(breakdown: breakdown)
             }
         }
         .background(StandardBackgroundView())
         .navigationBarBackButtonHidden(true)
         .navigationBarHidden(true)
+    }
+}
+
+struct BreakdownDetailSheet: View {
+    let breakdown: Breakdown
+
+    var body: some View {
+        VStack(spacing: 16) {
+            Text("🧾 Breakdown Details").font(.title2).bold()
+
+            Text("📍 Zone: \(breakdown.zone)")
+            Text("🛠 Equipment: \(breakdown.equipment)")
+            Text("📝 Summary: \(breakdown.faultSummary)")
+            Text("👤 Reported by: \(breakdown.submittedBy)")
+            Text("⏱ Downtime: \(breakdown.downtime) mins")
+            Text("📅 Submitted: \(breakdown.timeSubmitted.formatted(.dateTime.hour().minute()))")
+
+            Spacer()
+
+            Button("➕ Join Job") {
+                print("🛠 User joined the job for \(breakdown.equipment)")
+            }
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(Color.blue)
+            .foregroundColor(.white)
+            .cornerRadius(10)
+        }
+        .padding()
+        .presentationDetents([.medium, .large])
     }
 }
 
