@@ -1,116 +1,96 @@
 import SwiftUI
 
-struct Part: Identifiable {
-    let id = UUID()
-    let number: String
-    let name: String
-    let stock: Int
-    let location: String
-    let imageName: String? // Optional future support for photo
-}
-
-struct CheckStockView: View {
+struct CheckPartView: View {
+    @Environment(\.dismiss) var dismiss
     @State private var partNumber: String = ""
-    @State private var foundPart: Part?
-    @State private var showNotFound = false
-    @State private var showPartDetail = false
-
-    @State private var inventory: [Part] = [
-        Part(number: "123-ABC", name: "Hydraulic Pump", stock: 4, location: "Zone A", imageName: nil),
-        Part(number: "456-DEF", name: "Conveyor Motor", stock: 2, location: "Zone C", imageName: nil),
-        Part(number: "789-GHI", name: "Control Panel", stock: 0, location: "Zone D", imageName: nil),
-        Part(number: "321-JKL", name: "Gearbox Assembly", stock: 1, location: "Zone B", imageName: nil)
-    ]
+    @State private var showDetail: Bool = false
+    @State private var selectedPart: SparePart? = nil
 
     var body: some View {
         ZStack {
             StandardBackgroundView()
 
             VStack(spacing: 20) {
-                TopNavBar(title: "Check Stock", onBack: {}, onHome: {})
+                TopNavBar(
+                    title: "Check Stock",
+                    onBack: { dismiss() },
+                    onHome: { dismiss() }
+                )
 
-                Spacer()
-
-                Button("📷 Take Picture of Part") { }
-
-                TextField("Enter Part Number", text: $partNumber)
-                    .textFieldStyle(.roundedBorder)
-                    .padding(.horizontal)
-                    .foregroundColor(.black)
-
-                Button("🔍 Search") {
-                    if let found = inventory.first(where: { $0.number == partNumber }) {
-                        foundPart = found
-                        showPartDetail = true
-                        showNotFound = false
-                    } else {
-                        foundPart = nil
-                        showNotFound = true
+                VStack(spacing: 12) {
+                    Button("📸 Take Picture of Part") {
+                        // Placeholder for future camera integration
                     }
-                }
-                .buttonStyle(.borderedProminent)
+                    .buttonStyle(.borderedProminent)
 
-                if showNotFound {
-                    Text("❌ Part not found").foregroundColor(.red)
-                }
+                    TextField("Enter Part Number", text: $partNumber)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .foregroundColor(.black)
+                        .padding(.horizontal)
 
-                Spacer()
+                    Button("🔍 Search") {
+                        // Simulate finding a part
+                        selectedPart = SparePart.example()
+                        showDetail = true
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+                .padding()
             }
-            .padding()
         }
-        .sheet(isPresented: $showPartDetail) {
-            if let part = foundPart {
-                PartDetailView(part: part, inventory: $inventory)
+        .sheet(isPresented: $showDetail) {
+            if let part = selectedPart {
+                PartDetailSheet(part: part)
             }
         }
     }
 }
 
-struct PartDetailView: View {
-    var part: Part
-    @Binding var inventory: [Part]
+struct PartDetailSheet: View {
+    let part: SparePart
 
     var body: some View {
         VStack(spacing: 16) {
-            Text("📦 Part Info").font(.title2).bold()
+            Text("🔩 Part Details")
+                .font(.title2)
+                .bold()
 
-            if let imageName = part.imageName {
-                Image(imageName)
+            if let image = part.image {
+                Image(uiImage: image)
                     .resizable()
                     .scaledToFit()
-                    .frame(height: 160)
-                    .cornerRadius(10)
-            } else {
-                Image(systemName: "photo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 160)
-                    .foregroundColor(.gray)
+                    .frame(height: 150)
             }
 
-            Text("Name: \(part.name)")
-            Text("Number: \(part.number)")
-            Text("Location: \(part.location)")
-            Text("Stock: \(part.stock)")
-
-            Button("🛠 Take Part") {
-                if let index = inventory.firstIndex(where: { $0.id == part.id }) {
-                    if inventory[index].stock > 0 {
-                        inventory[index].stock -= 1
-                        print("Message to manager: Part \(part.number) taken. Stock now \(inventory[index].stock)")
-                    }
-                }
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(.blue)
+            Text("📦 Name: \(part.name)")
+            Text("🔢 Number: \(part.number)")
+            Text("📍 Location: \(part.location)")
+            Text("📦 Stock: \(part.stock)")
 
             Spacer()
+
+            Button("📤 Take Part (Coming Soon)") {
+                // Placeholder for future stock removal
+            }
+            .buttonStyle(.borderedProminent)
         }
         .padding()
-        .presentationDetents([.medium])
+        .presentationDetents([.medium, .large])
+    }
+}
+
+struct SparePart {
+    let name: String
+    let number: String
+    let location: String
+    let stock: Int
+    let image: UIImage?
+
+    static func example() -> SparePart {
+        SparePart(name: "Hydraulic Pump", number: "HP-1222", location: "Zone C Shelf 3", stock: 2, image: nil)
     }
 }
 
 #Preview {
-    CheckStockView()
+    CheckPartView()
 }
