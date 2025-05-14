@@ -53,16 +53,27 @@ struct BreakdownDetailSheet: View {
     var body: some View {
         VStack(spacing: 16) {
             Text("🧾 Breakdown Details").font(.title2).bold()
-
+            
             Text("📍 Zone: \(breakdown.zone)")
             Text("🛠 Equipment: \(breakdown.equipment)")
             Text("📝 Summary: \(breakdown.faultSummary)")
             Text("👤 Reported by: \(breakdown.submittedBy)")
             Text("⏱ Downtime: \(breakdown.downtime) mins")
             Text("📅 Submitted: \(breakdown.timeSubmitted.formatted(.dateTime.hour().minute()))")
-
+            
             Spacer()
-
+            
+            if hasJoined {
+                Button("🔁 Resume Job") {
+                    navigateToControl = true
+                }
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(Color.orange)
+                .foregroundColor(.white)
+                .cornerRadius(10)
+            } else { }
+            
             Button("➕ Join Job") {
                 BreakdownManager.shared.joinJob(breakdown: breakdown)
             }
@@ -71,13 +82,20 @@ struct BreakdownDetailSheet: View {
             .background(Color.blue)
             .foregroundColor(.white)
             .cornerRadius(10)
-
+            
             NavigationLink(
                 destination: BreakdownControlView(breakdown: breakdown),
                 isActive: $navigateToControl
             ) {
                 EmptyView()
             }
+        }
+        .onAppear {
+            hasJoined = breakdown.joinedEngineers.contains(username)
+        }
+        .padding()
+        .presentationDetents([.medium, .large])
+    }
 
             Button("🔧 Control Breakdown") {
                 navigateToControl = true
