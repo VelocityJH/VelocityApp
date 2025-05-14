@@ -2,58 +2,35 @@ import SwiftUI
 
 struct OpenJobsView: View {
     @Environment(\.dismiss) var dismiss
-
-    @State private var openBreakdowns: [Breakdown] = [
-        Breakdown(
-            zone: "Zone A",
-            equipment: "Conveyor 5",
-            faultSummary: "Motor fault",
-            timeSubmitted: Date(),
-            submittedBy: "James",
-            status: "Open",
-            downtime: 12
-        ),
-        Breakdown(
-            zone: "Zone B",
-            equipment: "Pump 2",
-            faultSummary: "Leak detected",
-            timeSubmitted: Date(),
-            submittedBy: "Alex",
-            status: "Open",
-            downtime: 45
-        )
-    ]
+    @StateObject private var breakdownManager = BreakdownManager.shared
 
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
                 TopNavBar(
-                    title: "Open Jobs",
+                    title: "Open Breakdowns",
                     onBack: { dismiss() },
                     onHome: { dismiss() }
                 )
 
-                ForEach(openBreakdowns) { breakdown in
+                ForEach(breakdownManager.openBreakdowns) { breakdown in
                     VStack(alignment: .leading, spacing: 6) {
                         Text("📍 Zone: \(breakdown.zone)").bold()
                         Text("🛠 Equipment: \(breakdown.equipment)")
-                        Text("⚠️ Summary: \(breakdown.faultSummary)")
-                        Text("👤 By: \(breakdown.submittedBy)")
+                        Text("⚠️ Fault: \(breakdown.faultSummary)")
+                        Text("👤 Reported by: \(breakdown.submittedBy)")
                         Text("⏱ Downtime: \(breakdown.downtime) mins")
-                        Text("📅 \(breakdown.timeSubmitted.formatted(.dateTime.hour().minute()))")
+                        Text("📅 Submitted: \(breakdown.timeSubmitted.formatted(.dateTime.hour().minute()))")
+                        Text("🔓 Status: \(breakdown.status)")
                     }
                     .padding()
-                    .background(Color.white.opacity(0.15))
+                    .background(Color.green.opacity(0.3))
                     .cornerRadius(12)
                     .padding(.horizontal)
                 }
             }
-            .padding(.top, 16)
         }
-        .background(
-            Color("AppBackground")
-                .ignoresSafeArea()
-        )
+        .background(StandardBackgroundView())
         .navigationBarBackButtonHidden(true)
         .navigationBarHidden(true)
     }
