@@ -1,0 +1,27 @@
+import SwiftUI
+
+struct ActionButton: View {
+    let label: String
+    let color: Color
+    let icon: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack {
+                Image(systemName: icon)
+                Text(label)
+                    .fontWeight(.semibold)
+            }
+            .padding()
+            .frame(minWidth: 150)
+            .background(color)
+            .foregroundColor(.white)
+            .cornerRadius(12)
+        }
+    }
+}
+
+#Preview {
+    ActionButton(label: "Scan Area", color: .orange, icon: "qrcode.viewfinder") {}
+}
