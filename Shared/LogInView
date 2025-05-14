@@ -1,49 +1,49 @@
 import SwiftUI
 
 struct LoginView: View {
-    @ObservedObject var session = UserSession.shared
-    @State private var username: String = ""
-    @State private var password: String = ""
-    @State private var showError = false
+    @State private var username = ""
+    @State private var password = ""
+    @State private var showHome = false
 
     var body: some View {
-        VStack(spacing: 20) {
-            Text("Welcome to Velocity")
-                .font(.largeTitle)
-                .bold()
+        ZStack {
+            Color("AppBackground")
+                .ignoresSafeArea()
 
-            TextField("Username", text: $username)
-                .textFieldStyle(.roundedBorder)
-                .foregroundColor(.black)
-                .padding(.horizontal)
+            VStack(spacing: 20) {
+                Text("Welcome to Velocity")
+                    .font(.title)
+                    .foregroundColor(.white)
 
-            SecureField("Password", text: $password)
-                .textFieldStyle(.roundedBorder)
-                .foregroundColor(.black)
-                .padding(.horizontal)
-
-            if showError {
-                Text("Invalid login").foregroundColor(.red)
-            }
-
-            Button("Login") {
-                if validateCredentials() {
-                    session.username = username
-                    session.isLoggedIn = true
-                } else {
-                    showError = true
+                VStack(spacing: 16) {
+                    InputField(placeholder: "Username", text: $username)
+                    SecureField("Password", text: $password)
+                        .padding()
+                        .frame(height: 50)
+                        .background(Color.white)
+                        .cornerRadius(10)
                 }
+
+                Button(action: handleLogin) {
+                    Text("Log In")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                }
+                .padding(.horizontal)
             }
-            .buttonStyle(.borderedProminent)
-            .disabled(username.isEmpty || password.isEmpty)
+            .padding()
+            .navigationDestination(isPresented: $showHome) {
+                HomeView()
+            }
         }
-        .padding()
-        .background(StandardBackgroundView())
     }
 
-    func validateCredentials() -> Bool {
-        // Hardcoded login for MVP (replace with secure logic later)
-        return username == "admin" && password == "password123"
+    func handleLogin() {
+        guard !username.isEmpty, !password.isEmpty else { return }
+        showHome = true
     }
 }
 
