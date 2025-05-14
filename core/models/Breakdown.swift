@@ -7,6 +7,8 @@ struct Breakdown: Identifiable {
     let zone: String
     let equipment: String
     let faultSummary: String
-    let submittedBy: String
     let timeSubmitted: Date
+    let submittedBy: String
+    let status: String
+    var downtime: Int
 }
