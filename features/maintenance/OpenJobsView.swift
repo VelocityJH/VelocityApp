@@ -1,5 +1,3 @@
-// Features/Maintenance/OpenJobsView.swift
-
 import SwiftUI
 
 struct OpenJobsView: View {
@@ -14,37 +12,48 @@ struct OpenJobsView: View {
             submittedBy: "James",
             status: "Open",
             downtime: 12
+        ),
+        Breakdown(
+            zone: "Zone B",
+            equipment: "Pump 2",
+            faultSummary: "Leak detected",
+            timeSubmitted: Date(),
+            submittedBy: "Alex",
+            status: "Open",
+            downtime: 45
         )
     ]
 
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                //TopNavBar(
-                 //   title: "Open Breakdowns",
-                 //   onBack: { dismiss() },
-                 //   onHome: { dismiss() } // Replace with .popToRoot if routing
-                //)
+                TopNavBar(
+                    title: "Open Jobs",
+                    onBack: { dismiss() },
+                    onHome: { dismiss() }
+                )
 
                 ForEach(openBreakdowns) { breakdown in
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("Zone: \(breakdown.zone)")
-                            .bold()
-                        Text("Equipment: \(breakdown.equipment)")
-                        Text("Summary: \(breakdown.faultSummary)")
-                        Text("Reported by: \(breakdown.submittedBy)")
-                        Text("Status: \(breakdown.status)")
-                        Text("Downtime: \(breakdown.downtime) mins")
-                        Text("Submitted: \(breakdown.timeSubmitted.formatted(.dateTime.hour().minute()))")
+                        Text("📍 Zone: \(breakdown.zone)").bold()
+                        Text("🛠 Equipment: \(breakdown.equipment)")
+                        Text("⚠️ Summary: \(breakdown.faultSummary)")
+                        Text("👤 By: \(breakdown.submittedBy)")
+                        Text("⏱ Downtime: \(breakdown.downtime) mins")
+                        Text("📅 \(breakdown.timeSubmitted.formatted(.dateTime.hour().minute()))")
                     }
                     .padding()
-                    .background(Color.green.opacity(0.3))
+                    .background(Color.white.opacity(0.15))
                     .cornerRadius(12)
                     .padding(.horizontal)
                 }
             }
+            .padding(.top, 16)
         }
-        background(StandardBackgroundView())
+        .background(
+            Color("AppBackground")
+                .ignoresSafeArea()
+        )
         .navigationBarBackButtonHidden(true)
         .navigationBarHidden(true)
     }
