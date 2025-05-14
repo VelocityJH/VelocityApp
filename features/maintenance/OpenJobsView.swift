@@ -1,25 +1,18 @@
-struct Breakdown: Identifiable {
-    let id: String
-    let zone: String
-    let equipment: String
-    let submittedBy: String
-    let faultSummary: String
-    let timeSubmitted: String
-    let status: String
-    var downtime: Int
-}
+// Features/Maintenance/OpenJobsView.swift
+
+import SwiftUI
 
 struct OpenJobsView: View {
     @Environment(\.dismiss) var dismiss
 
     @State private var openBreakdowns: [Breakdown] = [
         Breakdown(
-            id: UUID().uuidString,
+            id: UUID(),
             zone: "Zone A",
-            equipment: "Conveyor 1",
-            submittedBy: "John Doe",
-            faultSummary: "Motor failure",
-            timeSubmitted: "12 May 2025, 10:45",
+            equipment: "Conveyor 5",
+            faultSummary: "Motor fault",
+            timeSubmitted: Date(),
+            submittedBy: "James",
             status: "Open",
             downtime: 12
         )
@@ -31,28 +24,22 @@ struct OpenJobsView: View {
                 TopNavBar(
                     title: "Open Breakdowns",
                     onBack: { dismiss() },
-                    onHome: { dismiss() } // Replace with proper routing
+                    onHome: { dismiss() } // Replace with .popToRoot if routing
                 )
 
                 ForEach(openBreakdowns) { breakdown in
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("Zone: \(breakdown.zone)").font(.headline)
+                        Text("Zone: \(breakdown.zone)")
+                            .bold()
                         Text("Equipment: \(breakdown.equipment)")
-                        Text("Submitted by: \(breakdown.submittedBy)")
-                        Text("Submitted: \(breakdown.timeSubmitted)")
-                        Text("Fault: \(breakdown.faultSummary)")
+                        Text("Summary: \(breakdown.faultSummary)")
+                        Text("Reported by: \(breakdown.submittedBy)")
                         Text("Status: \(breakdown.status)")
                         Text("Downtime: \(breakdown.downtime) mins")
-
-                        NavigationLink("Manage Job", destination: Text("Manage job view"))
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.green)
-                            .cornerRadius(10)
+                        Text("Submitted: \(breakdown.timeSubmitted.formatted(.dateTime.hour().minute()))")
                     }
                     .padding()
-                    .background(Color.green.opacity(0.15))
+                    .background(Color.green.opacity(0.3))
                     .cornerRadius(12)
                     .padding(.horizontal)
                 }
@@ -60,4 +47,8 @@ struct OpenJobsView: View {
         }
         .background(Color("AppBackground").ignoresSafeArea())
     }
+}
+
+#Preview {
+    OpenJobsView()
 }
