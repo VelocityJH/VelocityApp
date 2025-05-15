@@ -2,71 +2,64 @@ import SwiftUI
 
 struct SelectPartsView: View {
     @Environment(\.dismiss) var dismiss
-    @Binding var selectedParts: [SparePart]
+    @State private var searchText: String = ""
+    @State private var selectedParts: [SparePart] = []
 
-    // Sample inventory (you could inject or share a real manager)
-    let inventory: [SparePart] = [
+    let allParts: [SparePart] = [
         SparePart(name: "Hydraulic Pump", number: "123-ABC", location: "Zone A", stock: 4, image: nil),
         SparePart(name: "Conveyor Motor", number: "456-DEF", location: "Zone B", stock: 2, image: nil),
         SparePart(name: "Control Panel", number: "789-GHI", location: "Zone C", stock: 0, image: nil),
         SparePart(name: "Gearbox Assembly", number: "321-JKL", location: "Zone D", stock: 3, image: nil)
     ]
 
+    var filteredParts: [SparePart] {
+        if searchText.isEmpty {
+            return allParts
+        } else {
+            return allParts.filter {
+                $0.name.localizedCaseInsensitiveContains(searchText) ||
+                $0.number.localizedCaseInsensitiveContains(searchText)
+            }
+        }
+    }
+
     var body: some View {
         ZStack {
             StandardBackgroundView().ignoresSafeArea()
 
-            ScrollView {
-                VStack(spacing: 16) {
-                    TopNavBar(
-                        title: "Select Parts",
-                        onBack: { dismiss() },
-                        onHome: { dismiss() }
-                    )
+            VStack(spacing: 16) {
+                TopNavBar(
+                    title: "Select Parts",
+                    onBack: { dismiss() },
+                    onHome: { dismiss() }
+                )
 
-                    ForEach(inventory) { part in
-                        Button(action: {
-                            togglePartSelection(part)
-                        }) {
-                            HStack {
-                                VStack(alignment: .leading) {
-                                    Text(part.name).bold()
-                                    Text("Number: \(part.number)")
-                                    Text("Stock: \(part.stock)")
-                                }
-                                Spacer()
-                                if selectedParts.contains(where: { $0.id == part.id }) {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .foregroundColor(.green)
-                                }
-                            }
-                            .padding()
-                            .background(Color.white.opacity(0.1))
-                            .cornerRadius(10)
-                        }
-                        .buttonStyle(.plain)
-                    }
-
-                    Button("Done") {
-                        dismiss()
-                    }
-                    .frame(maxWidth: .infinity)
+                TextField("Search by name or number", text: $searchText)
                     .padding()
-                    .background(Color.green)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                }
-                .padding()
-            }
-        }
-        .navigationBarHidden(true)
-    }
+                    .background(Color.white.opacity(0.2))
+                    .cornerRadius(8)
+                    .padding(.horizontal)
 
-    private func togglePartSelection(_ part: SparePart) {
-        if let index = selectedParts.firstIndex(where: { $0.id == part.id }) {
-            selectedParts.remove(at: index)
-        } else {
-            selectedParts.append(part)
+                ScrollView {
+                    LazyVStack(spacing: 12) {
+                        ForEach(filteredParts) { part in
+                            Button {
+                                selectedParts.append(part)
+                            } label: {
+                                VStack(alignment: .leading) {
+                                    Text(part.name).font(.headline).foregroundColor(.blue)
+                                    Text("Stock: \(part.stock)").foregroundColor(.gray)
+                                    Text("Location: \(part.location)").font(.caption)
+                                }
+                                .padding()
+                                .background(Color.blue.opacity(0.15))
+                                .cornerRadius(10)
+                                .padding(.horizontal)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
