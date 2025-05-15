@@ -4,6 +4,12 @@ struct BreakdownControlView: View {
     @Environment(\.dismiss) var dismiss
     var breakdown: Breakdown
 
+    @State private var showSupportPopup = false
+    @State private var selectedSupportTeam: String?
+    @State private var showRectificationPrompt = false
+    @State private var rectificationText = ""
+    @State private var showFaultTree = false // you can handle navigation here
+
     var body: some View {
         ZStack {
             Color(red: 3/255, green: 46/255, blue: 73/255)
@@ -18,12 +24,49 @@ struct BreakdownControlView: View {
                     )
 
                     Text("Zone: \(breakdown.zone)")
-                    Text("Equipment: \(breakdown.equipment)")
-                    Text("Reported: \(breakdown.timeSubmitted.formatted(.dateTime.hour().minute()))")
+                        .foregroundColor(.white)
 
+                    Text("Equipment: \(breakdown.equipment)")
+                        .foregroundColor(.white)
+
+                    Text("Reported: \(breakdown.timeSubmitted.formatted(.dateTime.hour().minute()))")
+                        .foregroundColor(.white)
+
+                    // 1. Spare Parts View link
+                    NavigationLink(destination: SelectPartsView()) {
+                        Text("Go to Spare Parts")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(10)
+                    }
+                    .padding(.horizontal)
+
+                    // 2. Request Support Button
+                    Button("Request Support") {
+                        showSupportPopup = true
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.orange)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                    .padding(.horizontal)
+
+                    // 3. Fault Trees & Manuals Button
+                    Button("Open Fault Trees & Manuals") {
+                        showFaultTree = true
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                    .padding(.horizontal)
+
+                    // 4. Close Job with Rectification Prompt
                     Button("✅ Close Job") {
-                        BreakdownManager.shared.completeJob(breakdown)
-                        dismiss()
+                        showRectificationPrompt = true
                     }
                     .frame(height: 50)
                     .frame(maxWidth: .infinity)
@@ -34,6 +77,23 @@ struct BreakdownControlView: View {
                 }
                 .padding()
             }
+        }
+
+        // Support popup
+        .confirmationDialog("Who do you request?", isPresented: $showSupportPopup, titleVisibility: .visible) {
+            Button("Riv Techs") { selectedSupportTeam = "Riv Techs" }
+            Button("Controls") { selectedSupportTeam = "Controls" }
+            Button("Cancel", role: .cancel) {}
+        }
+
+        // Rectification prompt before closing
+        .alert("How did you rectify the issue?", isPresented: $showRectificationPrompt) {
+            TextField("Enter rectification details...", text: $rectificationText)
+            Button("Submit") {
+                BreakdownManager.shared.completeJob(breakdown)
+                dismiss()
+            }
+            Button("Cancel", role: .cancel) {}
         }
     }
 }
