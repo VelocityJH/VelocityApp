@@ -1,41 +1,91 @@
 import SwiftUI
+import PhotosUI
 
 struct CWOCreationView: View {
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.dismiss) var dismiss
+    @State private var area: String = ""
+    @State private var zone: String = ""
+    @State private var workDescription: String = ""
+    @State private var selectedItems: [PhotosPickerItem] = []
+    @State private var selectedImage: UIImage? = nil
+    @State private var selectedParts: [SparePart] = []
 
     var body: some View {
         ZStack {
-            Color(red: 0.0235, green: 0.1843, blue: 0.2941).ignoresSafeArea()
+            StandardBackgroundView().ignoresSafeArea()
 
-            VStack {
-                header
-                Spacer()
-                Text("CWO Creation Placeholder")
+            ScrollView {
+                VStack(spacing: 16) {
+                    TopNavBar(
+                        title: "CWO Creation",
+                        onBack: { dismiss() },
+                        onHome: { dismiss() }
+                    )
+
+                    Group {
+                        TextField("Enter Area", text: $area)
+                            .textFieldStyle(.roundedBorder)
+
+                        TextField("Enter Zone", text: $zone)
+                            .textFieldStyle(.roundedBorder)
+
+                        Text("Work to be done:")
+                            .bold()
+
+                        TextEditor(text: $workDescription)
+                            .frame(height: 120)
+                            .background(Color.white.opacity(0.2))
+                            .cornerRadius(10)
+                    }
+
+                    PhotosPicker("Take Image of Issue", selection: $selectedItems, matching: .images)
+                        .onChange(of: selectedItems) { newItems in
+                            if let item = newItems.first {
+                                Task {
+                                    if let data = try? await item.loadTransferable(type: Data.self),
+                                       let uiImage = UIImage(data: data) {
+                                        selectedImage = uiImage
+                                    }
+                                }
+                            }
+                        }
+
+                    if let selectedImage = selectedImage {
+                        Image(uiImage: selectedImage)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 180)
+                            .cornerRadius(10)
+                    }
+
+                    NavigationLink(destination: SelectPartsView(selectedParts: $selectedParts)) {
+                        Text("Select Parts Required")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+
+                    Button("Submit CWO") {
+                        submitCWO()
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.green)
                     .foregroundColor(.white)
-                Spacer()
+                    .cornerRadius(10)
+                }
+                .padding()
             }
         }
+        .navigationBarBackButtonHidden(true)
+        .navigationBarHidden(true)
     }
 
-    private var header: some View {
-        HStack {
-            Button(action: { dismiss() }) {
-                Image(systemName: "arrow.left")
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.blue)
-                    .clipShape(Circle())
-            }
-            Spacer()
-            NavigationLink(destination: HomeView()) {
-                Image(systemName: "house.fill")
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.blue)
-                    .clipShape(Circle())
-            }
-        }
-        .padding(.horizontal)
-        .padding(.top)
+    private func submitCWO() {
+        let user = UserManager.shared.username
+        print("CWO Created by \(user): Area=\(area), Zone=\(zone)")
+        // Add persistence or send to backend here
     }
 }
