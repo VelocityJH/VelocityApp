@@ -1,5 +1,3 @@
-// CWOCreationView.swift
-
 import SwiftUI
 
 struct CWOCreationView: View {
@@ -8,16 +6,9 @@ struct CWOCreationView: View {
     @State private var area: String = ""
     @State private var zone: String = ""
     @State private var workDetails: String = ""
-    @State private var requiredParts: [SparePart] = []
+    @State private var selectedParts: [SparePart] = []
     @State private var showImagePicker = false
     @State private var selectedImage: UIImage?
-
-    let inventory: [SparePart] = [
-        SparePart(name: "Hydraulic Pump", number: "123-ABC", location: "Zone A", stock: 4, image: nil),
-        SparePart(name: "Conveyor Motor", number: "456-DEF", location: "Zone B", stock: 2, image: nil),
-        SparePart(name: "Control Panel", number: "789-GHI", location: "Zone C", stock: 0, image: nil),
-        SparePart(name: "Gearbox Assembly", number: "321-JKL", location: "Zone D", stock: 3, image: nil)
-    ]
 
     var body: some View {
         ZStack {
@@ -40,7 +31,6 @@ struct CWOCreationView: View {
                     Text("Work to be done:")
                         .bold()
                         .foregroundColor(.white)
-                        .frame(maxWidth: .infinity, alignment: .leading)
 
                     TextEditor(text: $workDetails)
                         .frame(height: 100)
@@ -52,14 +42,12 @@ struct CWOCreationView: View {
                     }
                     .foregroundColor(.blue)
 
-                    NavigationLink(destination:
-                        SelectPartsView(
-                            allParts: inventory,
-                            onSelection: { selected in
-                                self.requiredParts = selected
-                            }
-                        )
-                    ) {
+                    NavigationLink(destination: SelectPartsView(
+                        allParts: SparePartManager.shared.allParts,
+                        onSelection: { selected in
+                            self.selectedParts = selected
+                        }
+                    )) {
                         Text("Select Parts Required")
                             .frame(maxWidth: .infinity)
                             .padding()
@@ -80,16 +68,9 @@ struct CWOCreationView: View {
                 .padding()
             }
         }
-        .sheet(isPresented: $showImagePicker) {
-            // Placeholder for future ImagePicker integration
-            Text("Image picker to be added")
-        }
     }
 
     private func submitCWO() {
-        print("CWO Submitted by \(UserManager.shared.username)")
-        print("Area: \(area), Zone: \(zone)")
-        print("Work: \(workDetails)")
-        print("Parts: \(requiredParts.map { $0.name })")
+        print("Submitted CWO for area: \(area), zone: \(zone)")
     }
 }
