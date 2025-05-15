@@ -5,12 +5,8 @@ struct SelectPartsView: View {
     @State private var searchText: String = ""
     @State private var selectedParts: [SparePart] = []
 
-    let allParts: [SparePart] = [
-        SparePart(name: "Hydraulic Pump", number: "123-ABC", location: "Zone A", stock: 4, image: nil),
-        SparePart(name: "Conveyor Motor", number: "456-DEF", location: "Zone B", stock: 2, image: nil),
-        SparePart(name: "Control Panel", number: "789-GHI", location: "Zone C", stock: 0, image: nil),
-        SparePart(name: "Gearbox Assembly", number: "321-JKL", location: "Zone D", stock: 3, image: nil)
-    ]
+    let allParts: [SparePart]
+    let onSelection: ([SparePart]) -> Void
 
     var filteredParts: [SparePart] {
         if searchText.isEmpty {
@@ -28,11 +24,7 @@ struct SelectPartsView: View {
             StandardBackgroundView().ignoresSafeArea()
 
             VStack(spacing: 16) {
-                TopNavBar(
-                    title: "Select Parts",
-                    onBack: { dismiss() },
-                    onHome: { dismiss() }
-                )
+                TopNavBar(title: "Select Parts", onBack: { dismiss() }, onHome: { dismiss() })
 
                 TextField("Search by name or number", text: $searchText)
                     .padding()
@@ -44,21 +36,36 @@ struct SelectPartsView: View {
                     LazyVStack(spacing: 12) {
                         ForEach(filteredParts) { part in
                             Button {
-                                selectedParts.append(part)
+                                if selectedParts.contains(where: { $0.id == part.id }) {
+                                    selectedParts.removeAll { $0.id == part.id }
+                                } else {
+                                    selectedParts.append(part)
+                                }
                             } label: {
                                 VStack(alignment: .leading) {
-                                    Text(part.name).font(.headline).foregroundColor(.blue)
+                                    Text(part.name).font(.headline).foregroundColor(.white)
                                     Text("Stock: \(part.stock)").foregroundColor(.gray)
                                     Text("Location: \(part.location)").font(.caption)
                                 }
                                 .padding()
-                                .background(Color.blue.opacity(0.15))
+                                .background(selectedParts.contains(where: { $0.id == part.id }) ? Color.green.opacity(0.6) : Color.blue.opacity(0.2))
                                 .cornerRadius(10)
                                 .padding(.horizontal)
                             }
                         }
                     }
                 }
+
+                Button("Confirm Selection") {
+                    onSelection(selectedParts)
+                    dismiss()
+                }
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(Color.green)
+                .foregroundColor(.white)
+                .cornerRadius(10)
+                .padding(.horizontal)
             }
         }
     }
