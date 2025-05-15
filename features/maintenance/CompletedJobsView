@@ -1,0 +1,50 @@
+import SwiftUI
+
+struct CompletedJobsView: View {
+    @ObservedObject private var manager = BreakdownManager.shared
+
+    var body: some View {
+        StandardBackgroundView {
+            VStack(spacing: 0) {
+                TopNavBar(title: "Completed Jobs")
+
+                ScrollView {
+                    VStack(spacing: 16) {
+                        ForEach(manager.completedBreakdowns) { job in
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("Zone: \(job.zone)").bold()
+                                Text("Equipment: \(job.equipment)")
+                                Text("Completed by: \(job.completedBy ?? "N/A")")
+                                Text("Duration: \(formattedDuration(from: job.timeSubmitted, to: job.endTime))")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            }
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Color.white)
+                            .cornerRadius(12)
+                            .shadow(radius: 1)
+                            .padding(.horizontal)
+                        }
+
+                        if manager.completedBreakdowns.isEmpty {
+                            Text("No completed jobs yet.")
+                                .foregroundColor(.white)
+                                .padding(.top, 40)
+                        }
+                    }
+                    .padding(.top)
+                }
+            }
+        }
+    }
+
+    // Helper to calculate duration
+    func formattedDuration(from start: Date, to end: Date?) -> String {
+        guard let end = end else { return "—" }
+        let interval = Int(end.timeIntervalSince(start))
+        let minutes = interval / 60
+        let seconds = interval % 60
+        return "\(minutes)m \(seconds)s"
+    }
+}
