@@ -2,8 +2,6 @@ import SwiftUI
 
 struct BreakdownControlView: View {
     @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var partsManager: SparePartsManager
-
     var breakdown: Breakdown
 
     @State private var showSupportPopup = false
@@ -13,27 +11,26 @@ struct BreakdownControlView: View {
 
     var body: some View {
         StandardBackgroundView {
-            VStack(spacing: 20) {
-                TopNavBar()
+            VStack {
+                TopNavBar(title: "Breakdown Control", onBack: { dismiss() }, onHome: { dismiss() })
 
                 ScrollView {
-                    VStack(spacing: 24) {
-                        // Breakdown Info
-                        Text("Zone: \(breakdown.zone)")
-                            .foregroundColor(.white)
+                    VStack(alignment: .leading, spacing: 20) {
+                        // Breakdown info
+                        Group {
+                            Text("Zone: \(breakdown.zone)")
+                            Text("Equipment: \(breakdown.equipment)")
+                            Text("Reported: \(breakdown.timeSubmitted.formatted(.dateTime.hour().minute()))")
+                        }
+                        .foregroundColor(.white)
+                        .padding(.horizontal)
 
-                        Text("Equipment: \(breakdown.equipment)")
-                            .foregroundColor(.white)
-
-                        Text("Reported: \(breakdown.timeSubmitted.formatted(.dateTime.hour().minute()))")
-                            .foregroundColor(.white)
-
-                        // 1. Spare Parts View Link
+                        // 1. Spare Parts Selection
                         NavigationLink(destination:
                             SelectPartsView(
-                                allParts: partsManager.availableParts,
-                                onSelection: { selectedPart in
-                                    partsManager.selectedParts.append(selectedPart)
+                                allParts: SparePartManager.shared.availableParts,
+                                onSelection: { selected in
+                                    SparePartManager.shared.selectedParts.append(selected)
                                 }
                             )
                         ) {
@@ -45,7 +42,7 @@ struct BreakdownControlView: View {
                         }
                         .padding(.horizontal)
 
-                        // 2. Request Support Button
+                        // 2. Request Support
                         Button("Request Support") {
                             showSupportPopup = true
                         }
@@ -58,7 +55,7 @@ struct BreakdownControlView: View {
 
                         // 3. Fault Trees & Manuals
                         Button("Open Fault Trees & Manuals") {
-                            // Placeholder for future AI/OCR/manual viewer
+                            // Placeholder for future OCR/manual logic
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -67,7 +64,7 @@ struct BreakdownControlView: View {
                         .cornerRadius(10)
                         .padding(.horizontal)
 
-                        // 4. Close Job with Rectification
+                        // 4. Complete Job Button
                         Button("✅ Complete Job") {
                             showRectificationPrompt = true
                         }
@@ -78,29 +75,26 @@ struct BreakdownControlView: View {
                         .cornerRadius(12)
                         .padding(.horizontal)
                     }
+                    .padding(.bottom, 40)
                 }
             }
         }
-        // Request Support Popup
-        .confirmationDialog("Who do you request?", isPresented: $showSupportPopup, titleVisibility: .visible) {
+        // Support popup
+        .confirmationDialog("Who do you request?", isPresented: $showSupportPopup) {
             Button("Riv Techs") { selectedSupportTeam = "Riv Techs" }
             Button("Controls") { selectedSupportTeam = "Controls" }
             Button("Cancel", role: .cancel) {}
         }
 
-        // Rectification Prompt
+        // Rectification prompt
         .alert("How did you rectify the issue?", isPresented: $showRectificationPrompt) {
-            TextField("Enter resolution...", text: $rectificationText)
+            TextField("Enter details...", text: $rectificationText)
             Button("Submit") {
-                BreakdownManager.shared.completeJob(breakdown)
+                // Simulated job close logic
+                SparePartManager.shared.clearSelectedParts()
                 dismiss()
             }
             Button("Cancel", role: .cancel) {}
         }
     }
-}
-
-#Preview {
-    BreakdownControlView(breakdown: Breakdown.mock)
-        .environmentObject(SparePartsManager())
 }
