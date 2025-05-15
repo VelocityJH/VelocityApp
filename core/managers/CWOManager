@@ -1,0 +1,23 @@
+// Managers/CWOManager.swift
+import Foundation
+import Combine
+
+final class CWOManager: ObservableObject {
+    static let shared = CWOManager()
+
+    @Published private(set) var cwoList: [CWO] = []
+
+    private init() {}
+
+    func addCWO(_ cwo: CWO) {
+        cwoList.append(cwo)
+    }
+
+    func removeCWO(id: UUID) {
+        if let index = cwoList.firstIndex(where: { $0.id == id }) {
+            cwoList.remove(at: index)
+        }
+    }
+
+    // Optional future: mark as completed etc.
+}
