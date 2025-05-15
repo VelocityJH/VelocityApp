@@ -1,0 +1,33 @@
+import Foundation
+import UIKit
+
+struct CWORequest: Identifiable, Codable {
+    let id: UUID
+    let zone: String
+    let equipment: String
+    let description: String
+    let parts: [SparePart]
+    let imageData: Data?
+    let submittedBy: String
+    let timestamp: Date
+
+    init(
+        id: UUID = UUID(),
+        zone: String,
+        equipment: String,
+        description: String,
+        parts: [SparePart],
+        imageData: Data?,
+        submittedBy: String,
+        timestamp: Date = Date()
+    ) {
+        self.id = id
+        self.zone = zone
+        self.equipment = equipment
+        self.description = description
+        self.parts = parts
+        self.imageData = imageData
+        self.submittedBy = submittedBy
+        self.timestamp = timestamp
+    }
+}
