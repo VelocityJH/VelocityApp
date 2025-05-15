@@ -1,0 +1,16 @@
+import Foundation
+
+final class SparePartManager: ObservableObject {
+    static let shared = SparePartManager()
+
+    @Published var allParts: [SparePart]
+
+    private init() {
+        self.allParts = [
+            SparePart(name: "Hydraulic Pump", number: "123-ABC", location: "Zone A", stock: 4),
+            SparePart(name: "Conveyor Motor", number: "456-DEF", location: "Zone B", stock: 2),
+            SparePart(name: "Control Panel", number: "789-GHI", location: "Zone C", stock: 0),
+            SparePart(name: "Gearbox Assembly", number: "321-JKL", location: "Zone D", stock: 3)
+        ]
+    }
+}
