@@ -4,6 +4,7 @@ struct SelectPartsView: View {
     let allParts: [SparePart]
     let onSelection: (SparePart) -> Void
 
+    @Environment(\.dismiss) var dismiss
     @State private var searchText = ""
 
     var filteredParts: [SparePart] {
@@ -20,7 +21,11 @@ struct SelectPartsView: View {
     var body: some View {
         StandardBackgroundView {
             VStack(spacing: 0) {
-                TopNavBar()
+                TopNavBar(
+                    title: "Select Parts",
+                    onBack: { dismiss() },
+                    onHome: { dismiss() } // You can route this elsewhere later
+                )
 
                 // Search Bar
                 TextField("Search by name or number", text: $searchText)
@@ -33,6 +38,7 @@ struct SelectPartsView: View {
                         ForEach(filteredParts) { part in
                             Button(action: {
                                 onSelection(part)
+                                dismiss()
                             }) {
                                 VStack(alignment: .leading, spacing: 6) {
                                     Text(part.name)
