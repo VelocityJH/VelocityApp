@@ -2,93 +2,95 @@ import SwiftUI
 
 struct BreakdownControlView: View {
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var partsManager: SparePartsManager
+
     var breakdown: Breakdown
 
     @State private var showSupportPopup = false
     @State private var selectedSupportTeam: String?
     @State private var showRectificationPrompt = false
     @State private var rectificationText = ""
-    @State private var showFaultTree = false // you can handle navigation here
 
     var body: some View {
-        ZStack {
-            Color(red: 3/255, green: 46/255, blue: 73/255)
-                .ignoresSafeArea()
+        StandardBackgroundView {
+            VStack(spacing: 20) {
+                TopNavBar()
 
-            ScrollView {
-                VStack(spacing: 24) {
-                    TopNavBar(
-                        title: "Breakdown Control",
-                        onBack: { dismiss() },
-                        onHome: { dismiss() }
-                    )
+                ScrollView {
+                    VStack(spacing: 24) {
+                        // Breakdown Info
+                        Text("Zone: \(breakdown.zone)")
+                            .foregroundColor(.white)
 
-                    Text("Zone: \(breakdown.zone)")
+                        Text("Equipment: \(breakdown.equipment)")
+                            .foregroundColor(.white)
+
+                        Text("Reported: \(breakdown.timeSubmitted.formatted(.dateTime.hour().minute()))")
+                            .foregroundColor(.white)
+
+                        // 1. Spare Parts View Link
+                        NavigationLink(destination:
+                            SelectPartsView(
+                                allParts: partsManager.availableParts,
+                                onSelection: { selectedPart in
+                                    partsManager.selectedParts.append(selectedPart)
+                                }
+                            )
+                        ) {
+                            Text("Go to Spare Parts")
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.white)
+                                .cornerRadius(10)
+                        }
+                        .padding(.horizontal)
+
+                        // 2. Request Support Button
+                        Button("Request Support") {
+                            showSupportPopup = true
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.orange)
                         .foregroundColor(.white)
+                        .cornerRadius(10)
+                        .padding(.horizontal)
 
-                    Text("Equipment: \(breakdown.equipment)")
+                        // 3. Fault Trees & Manuals
+                        Button("Open Fault Trees & Manuals") {
+                            // Placeholder for future AI/OCR/manual viewer
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue)
                         .foregroundColor(.white)
+                        .cornerRadius(10)
+                        .padding(.horizontal)
 
-                    Text("Reported: \(breakdown.timeSubmitted.formatted(.dateTime.hour().minute()))")
+                        // 4. Close Job with Rectification
+                        Button("✅ Complete Job") {
+                            showRectificationPrompt = true
+                        }
+                        .frame(height: 50)
+                        .frame(maxWidth: .infinity)
+                        .background(Color.green)
                         .foregroundColor(.white)
-
-                    // 1. Spare Parts View link
-                    NavigationLink(destination: SelectPartsView()) {
-                        Text("Go to Spare Parts")
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.white)
-                            .cornerRadius(10)
+                        .cornerRadius(12)
+                        .padding(.horizontal)
                     }
-                    .padding(.horizontal)
-
-                    // 2. Request Support Button
-                    Button("Request Support") {
-                        showSupportPopup = true
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.orange)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                    .padding(.horizontal)
-
-                    // 3. Fault Trees & Manuals Button
-                    Button("Open Fault Trees & Manuals") {
-                        showFaultTree = true
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                    .padding(.horizontal)
-
-                    // 4. Close Job with Rectification Prompt
-                    Button("✅ Close Job") {
-                        showRectificationPrompt = true
-                    }
-                    .frame(height: 50)
-                    .frame(maxWidth: .infinity)
-                    .background(Color.green)
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
-                    .padding(.horizontal)
                 }
-                .padding()
             }
         }
-
-        // Support popup
+        // Request Support Popup
         .confirmationDialog("Who do you request?", isPresented: $showSupportPopup, titleVisibility: .visible) {
             Button("Riv Techs") { selectedSupportTeam = "Riv Techs" }
             Button("Controls") { selectedSupportTeam = "Controls" }
             Button("Cancel", role: .cancel) {}
         }
 
-        // Rectification prompt before closing
+        // Rectification Prompt
         .alert("How did you rectify the issue?", isPresented: $showRectificationPrompt) {
-            TextField("Enter rectification details...", text: $rectificationText)
+            TextField("Enter resolution...", text: $rectificationText)
             Button("Submit") {
                 BreakdownManager.shared.completeJob(breakdown)
                 dismiss()
@@ -100,4 +102,5 @@ struct BreakdownControlView: View {
 
 #Preview {
     BreakdownControlView(breakdown: Breakdown.mock)
+        .environmentObject(SparePartsManager())
 }
