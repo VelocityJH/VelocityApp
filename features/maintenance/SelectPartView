@@ -2,71 +2,68 @@ import SwiftUI
 
 struct SelectPartsView: View {
     @Environment(\.dismiss) var dismiss
-    @State private var searchText: String = ""
-    @State private var selectedParts: [SparePart] = []
 
-    let allParts: [SparePart]
-    let onSelection: ([SparePart]) -> Void
+    var allParts: [SparePart]
+    var onSelection: ([SparePart]) -> Void
+
+    @State private var selectedParts: [SparePart] = []
+    @State private var searchQuery = ""
 
     var filteredParts: [SparePart] {
-        if searchText.isEmpty {
+        if searchQuery.isEmpty {
             return allParts
         } else {
-            return allParts.filter {
-                $0.name.localizedCaseInsensitiveContains(searchText) ||
-                $0.number.localizedCaseInsensitiveContains(searchText)
-            }
+            return allParts.filter { $0.name.localizedCaseInsensitiveContains(searchQuery) || $0.number.localizedCaseInsensitiveContains(searchQuery) }
         }
     }
 
     var body: some View {
-        ZStack {
-            StandardBackgroundView().ignoresSafeArea()
+        VStack(spacing: 16) {
+            TopNavBar(title: "Select Parts", onBack: { dismiss() }, onHome: { dismiss() })
 
-            VStack(spacing: 16) {
-                TopNavBar(title: "Select Parts", onBack: { dismiss() }, onHome: { dismiss() })
+            TextField("Search Part...", text: $searchQuery)
+                .padding()
+                .background(Color.white)
+                .cornerRadius(8)
+                .padding(.horizontal)
 
-                TextField("Search by name or number", text: $searchText)
-                    .padding()
-                    .background(Color.white.opacity(0.2))
-                    .cornerRadius(8)
-                    .padding(.horizontal)
-
-                ScrollView {
-                    LazyVStack(spacing: 12) {
-                        ForEach(filteredParts) { part in
-                            Button {
-                                if selectedParts.contains(where: { $0.id == part.id }) {
-                                    selectedParts.removeAll { $0.id == part.id }
-                                } else {
-                                    selectedParts.append(part)
-                                }
-                            } label: {
-                                VStack(alignment: .leading) {
-                                    Text(part.name).font(.headline).foregroundColor(.white)
-                                    Text("Stock: \(part.stock)").foregroundColor(.gray)
-                                    Text("Location: \(part.location)").font(.caption)
-                                }
-                                .padding()
-                                .background(selectedParts.contains(where: { $0.id == part.id }) ? Color.green.opacity(0.6) : Color.blue.opacity(0.2))
-                                .cornerRadius(10)
-                                .padding(.horizontal)
+            ScrollView {
+                VStack(spacing: 12) {
+                    ForEach(filteredParts) { part in
+                        Button(action: {
+                            if selectedParts.contains(where: { $0.id == part.id }) {
+                                selectedParts.removeAll { $0.id == part.id }
+                            } else {
+                                selectedParts.append(part)
                             }
+                        }) {
+                            VStack(alignment: .leading) {
+                                Text(part.name).font(.headline)
+                                Text("Stock: \(part.stock)").font(.subheadline)
+                                Text("Location: \(part.location)").font(.caption)
+                            }
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(selectedParts.contains(where: { $0.id == part.id }) ? Color.green.opacity(0.3) : Color.gray.opacity(0.2))
+                            .cornerRadius(10)
                         }
                     }
-                }
-
-                Button("Confirm Selection") {
-                    onSelection(selectedParts)
-                    dismiss()
-                }
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(Color.green)
-                .foregroundColor(.white)
-                .cornerRadius(10)
-                .padding(.horizontal)
+                }.padding(.horizontal)
             }
+
+            Button("Confirm Selection") {
+                onSelection(selectedParts)
+                dismiss()
+            }
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(Color.blue)
+            .foregroundColor(.white)
+            .cornerRadius(12)
+            .padding(.horizontal)
         }
+        .background(StandardBackgroundView().ignoresSafeArea())
+        .navigationBarBackButtonHidden(true)
+        .navigationBarHidden(true)
     }
 }
