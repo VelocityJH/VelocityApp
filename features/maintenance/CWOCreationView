@@ -1,14 +1,23 @@
+// CWOCreationView.swift
+
 import SwiftUI
-import PhotosUI
 
 struct CWOCreationView: View {
     @Environment(\.dismiss) var dismiss
+
     @State private var area: String = ""
     @State private var zone: String = ""
-    @State private var workDescription: String = ""
-    @State private var selectedItems: [PhotosPickerItem] = []
-    @State private var selectedImage: UIImage? = nil
-    @State private var selectedParts: [SparePart] = []
+    @State private var workDetails: String = ""
+    @State private var requiredParts: [SparePart] = []
+    @State private var showImagePicker = false
+    @State private var selectedImage: UIImage?
+
+    let inventory: [SparePart] = [
+        SparePart(name: "Hydraulic Pump", number: "123-ABC", location: "Zone A", stock: 4, image: nil),
+        SparePart(name: "Conveyor Motor", number: "456-DEF", location: "Zone B", stock: 2, image: nil),
+        SparePart(name: "Control Panel", number: "789-GHI", location: "Zone C", stock: 0, image: nil),
+        SparePart(name: "Gearbox Assembly", number: "321-JKL", location: "Zone D", stock: 3, image: nil)
+    ]
 
     var body: some View {
         ZStack {
@@ -22,43 +31,35 @@ struct CWOCreationView: View {
                         onHome: { dismiss() }
                     )
 
-                    Group {
-                        TextField("Enter Area", text: $area)
-                            .textFieldStyle(.roundedBorder)
+                    TextField("Enter Area", text: $area)
+                        .textFieldStyle(.roundedBorder)
 
-                        TextField("Enter Zone", text: $zone)
-                            .textFieldStyle(.roundedBorder)
+                    TextField("Enter Zone", text: $zone)
+                        .textFieldStyle(.roundedBorder)
 
-                        Text("Work to be done:")
-                            .bold()
+                    Text("Work to be done:")
+                        .bold()
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity, alignment: .leading)
 
-                        TextEditor(text: $workDescription)
-                            .frame(height: 120)
-                            .background(Color.white.opacity(0.2))
-                            .cornerRadius(10)
+                    TextEditor(text: $workDetails)
+                        .frame(height: 100)
+                        .background(Color.white)
+                        .cornerRadius(10)
+
+                    Button("Take Image of Issue") {
+                        showImagePicker = true
                     }
+                    .foregroundColor(.blue)
 
-                    PhotosPicker("Take Image of Issue", selection: $selectedItems, matching: .images)
-                        .onChange(of: selectedItems) { newItems in
-                            if let item = newItems.first {
-                                Task {
-                                    if let data = try? await item.loadTransferable(type: Data.self),
-                                       let uiImage = UIImage(data: data) {
-                                        selectedImage = uiImage
-                                    }
-                                }
+                    NavigationLink(destination:
+                        SelectPartsView(
+                            allParts: inventory,
+                            onSelection: { selected in
+                                self.requiredParts = selected
                             }
-                        }
-
-                    if let selectedImage = selectedImage {
-                        Image(uiImage: selectedImage)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 180)
-                            .cornerRadius(10)
-                    }
-
-                    NavigationLink(destination: SelectPartsView(selectedParts: $selectedParts)) {
+                        )
+                    ) {
                         Text("Select Parts Required")
                             .frame(maxWidth: .infinity)
                             .padding()
@@ -79,13 +80,16 @@ struct CWOCreationView: View {
                 .padding()
             }
         }
-        .navigationBarBackButtonHidden(true)
-        .navigationBarHidden(true)
+        .sheet(isPresented: $showImagePicker) {
+            // Placeholder for future ImagePicker integration
+            Text("Image picker to be added")
+        }
     }
 
     private func submitCWO() {
-        let user = UserManager.shared.username
-        print("CWO Created by \(user): Area=\(area), Zone=\(zone)")
-        // Add persistence or send to backend here
+        print("CWO Submitted by \(UserManager.shared.username)")
+        print("Area: \(area), Zone: \(zone)")
+        print("Work: \(workDetails)")
+        print("Parts: \(requiredParts.map { $0.name })")
     }
 }
