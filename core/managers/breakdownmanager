@@ -5,13 +5,16 @@ final class BreakdownManager: ObservableObject {
     static let shared = BreakdownManager()
 
     @Published var openBreakdowns: [Breakdown] = []
+    @Published var completedBreakdowns: [Breakdown] = []
 
     private init() {}
 
+    // Add new breakdown to the open list
     func addBreakdown(_ breakdown: Breakdown) {
         openBreakdowns.append(breakdown)
     }
 
+    // Engineer joins an active breakdown
     func joinJob(breakdown: Breakdown) {
         let username = UserManager.shared.username
         guard !username.isEmpty else { return }
@@ -23,14 +26,23 @@ final class BreakdownManager: ObservableObject {
         }
     }
 
+    // Mark a breakdown as complete, move it to completed list
     func completeJob(breakdown: Breakdown) {
         let username = UserManager.shared.username
         guard !username.isEmpty else { return }
 
         if let index = openBreakdowns.firstIndex(where: { $0.id == breakdown.id }) {
-            openBreakdowns[index].status = "Closed"
-            openBreakdowns[index].endTime = Date()
-            openBreakdowns[index].completedBy = username
+            var completed = openBreakdowns.remove(at: index)
+            completed.status = "Closed"
+            completed.endTime = Date()
+            completed.completedBy = username
+            completedBreakdowns.append(completed)
         }
+    }
+
+    // Reset all (for testing or clearing state)
+    func clearAll() {
+        openBreakdowns.removeAll()
+        completedBreakdowns.removeAll()
     }
 }
