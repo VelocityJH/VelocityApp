@@ -5,69 +5,77 @@ struct SelectPartsView: View {
     let onSelection: ([SparePart]) -> Void
 
     @Environment(\.dismiss) private var dismiss
-    @State private var searchQuery = ""
+    @State private var searchText: String = ""
     @State private var selectedParts: Set<UUID> = []
 
     var filteredParts: [SparePart] {
-        if searchQuery.isEmpty {
+        if searchText.isEmpty {
             return allParts
         } else {
             return allParts.filter {
-                $0.name.localizedCaseInsensitiveContains(searchQuery) ||
-                $0.number.localizedCaseInsensitiveContains(searchQuery)
+                $0.name.localizedCaseInsensitiveContains(searchText) ||
+                $0.number.localizedCaseInsensitiveContains(searchText)
             }
         }
     }
 
     var body: some View {
-        ZStack {
-            StandardBackgroundView().ignoresSafeArea()
+        VStack(spacing: 16) {
+            TopNavBar(
+                title: "Select Parts",
+                onBack: { dismiss() },
+                onHome: { dismiss() }
+            )
 
-            VStack(spacing: 16) {
-                TopNavBar(title: "Select Parts", onBack: { dismiss() }, onHome: { dismiss() })
+            TextField("Search by part name or number", text: $searchText)
+                .padding()
+                .background(Color.white)
+                .cornerRadius(8)
+                .padding(.horizontal)
 
-                TextField("Search Part Name or Number", text: $searchQuery)
-                    .textFieldStyle(.roundedBorder)
-                    .padding(.horizontal)
-
-                List(filteredParts) { part in
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(part.name).bold()
-                            Text("Stock: \(part.stock)")
-                            Text("Location: \(part.location)").font(.caption)
-                        }
-                        Spacer()
-                        Image(systemName: selectedParts.contains(part.id) ? "checkmark.circle.fill" : "circle")
-                            .onTapGesture {
-                                toggleSelection(for: part)
+            ScrollView {
+                VStack(spacing: 12) {
+                    ForEach(filteredParts) { part in
+                        Button(action: {
+                            if selectedParts.contains(part.id) {
+                                selectedParts.remove(part.id)
+                            } else {
+                                selectedParts.insert(part.id)
                             }
+                        }) {
+                            HStack {
+                                VStack(alignment: .leading) {
+                                    Text(part.name).bold()
+                                    Text("Stock: \(part.stock)")
+                                    Text("Location: \(part.location)")
+                                }
+                                Spacer()
+                                Image(systemName: selectedParts.contains(part.id) ? "checkmark.circle.fill" : "circle")
+                                    .foregroundColor(.blue)
+                            }
+                            .padding()
+                            .background(Color.white.opacity(0.8))
+                            .cornerRadius(10)
+                        }
                     }
                 }
-                .listStyle(.plain)
-
-                Button("✅ Confirm Selection") {
-                    let selected = allParts.filter { selectedParts.contains($0.id) }
-                    onSelection(selected)
-                    dismiss()
-                }
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(Color.green)
-                .foregroundColor(.white)
-                .cornerRadius(10)
                 .padding(.horizontal)
             }
+
+            Button("Confirm Selection") {
+                let selected = allParts.filter { selectedParts.contains($0.id) }
+                onSelection(selected)
+                dismiss()
+            }
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(Color.green)
+            .foregroundColor(.white)
+            .cornerRadius(10)
+            .padding(.horizontal)
         }
+        .background(StandardBackgroundView())
         .navigationBarBackButtonHidden(true)
         .navigationBarHidden(true)
-    }
-
-    private func toggleSelection(for part: SparePart) {
-        if selectedParts.contains(part.id) {
-            selectedParts.remove(part.id)
-        } else {
-            selectedParts.insert(part.id)
-        }
     }
 }
