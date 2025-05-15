@@ -1,135 +1,106 @@
-//
-//  CWOCreationView.swift
-//  Velocity
-//
-//  Updated by Code Copilot
-
 import SwiftUI
 import PhotosUI
 
 struct CWOCreationView: View {
-    @Environment(\.dismiss) private var dismiss
-    @State private var zone: String = ""
-    @State private var equipment: String = ""
+    @EnvironmentObject var partsManager: SparePartsManager
+
     @State private var workDescription: String = ""
-    @State private var requiredParts: String = ""
-    @State private var selectedImage: UIImage? = nil
-    @State private var selectedItem: PhotosPickerItem? = nil
-    @State private var showAlert = false
+    @State private var selectedItem: PhotosPickerItem?
+    @State private var selectedImage: UIImage?
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Color(red: 0.0235, green: 0.1843, blue: 0.2941)
-                    .ignoresSafeArea()
+        ZStack {
+            Color("velocityBlue").ignoresSafeArea()
 
-                ScrollView {
-                    VStack(spacing: 20) {
-                        HStack {
-                            Button(action: { dismiss() }) {
-                                Image(systemName: "arrow.left")
-                                    .foregroundColor(.white)
-                                    .padding()
-                                    .background(Color.blue.opacity(0.7))
-                                    .clipShape(Circle())
-                            }
-
-                            Spacer()
-
-                            NavigationLink(destination: HomeView()) {
-                                Image(systemName: "house.fill")
-                                    .foregroundColor(.white)
-                                    .padding()
-                                    .background(Color.blue.opacity(0.7))
-                                    .clipShape(Circle())
-                            }
-                        }
-                        .padding(.horizontal, 20)
-                        .padding(.top, 60)
-
-                        Text("Create CWO Request")
-                            .font(.largeTitle)
-                            .foregroundColor(.white)
-
-                        Button("Scan QR Code") {
-                            // TODO: Hook up QR scanner to fill zone + equipment
-                        }
-                        .padding()
-                        .background(Color.gray.opacity(0.3))
-                        .cornerRadius(10)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 25) {
+                    Text("Create CWO")
+                        .font(.largeTitle.bold())
                         .foregroundColor(.white)
+                        .padding(.top, 40)
+                        .frame(maxWidth: .infinity, alignment: .center)
 
-                        Group {
-                            TextField("Zone", text: $zone)
-                            TextField("Equipment", text: $equipment)
-                        }
-                        .textFieldStyle(.roundedBorder)
+                    // Brief Work Description
+                    Text("Brief Work Description:")
+                        .foregroundColor(.white)
+                        .bold()
                         .padding(.horizontal)
 
-                        TextField("Brief Work Description", text: $workDescription, axis: .vertical)
-                            .textFieldStyle(.roundedBorder)
-                            .padding(.horizontal)
-                            .lineLimit(3...5)
-
-                        TextField("Parts Required", text: $requiredParts, axis: .vertical)
-                            .textFieldStyle(.roundedBorder)
-                            .padding(.horizontal)
-                            .lineLimit(2...4)
-
-                        PhotosPicker(selection: $selectedItem, matching: .images) {
-                            Text("Attach Image")
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.orange)
-                                .foregroundColor(.white)
-                                .cornerRadius(10)
-                        }
-                        .padding(.horizontal)
-                        .onChange(of: selectedItem) { newItem in
-                            Task {
-                                if let data = try? await newItem?.loadTransferable(type: Data.self),
-                                   let uiImage = UIImage(data: data) {
-                                    selectedImage = uiImage
-                                }
-                            }
-                        }
-
-                        if let image = selectedImage {
-                            Image(uiImage: image)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(maxWidth: 300)
-                                .cornerRadius(12)
-                                .padding(.bottom)
-                        }
-
-                        Button("Submit CWO Request") {
-                            let imageData = selectedImage?.jpegData(compressionQuality: 0.8)
-                            let newCWO = CWORequest(
-                                zone: zone,
-                                equipment: equipment,
-                                description: workDescription,
-                                parts: requiredParts,
-                                imageData: imageData,
-                                submittedBy: UserManager.shared.username
-                            )
-                            CWOManager.shared.submit(newCWO)
-                            showAlert = true
-                        }
-                        .frame(maxWidth: .infinity)
+                    TextEditor(text: $workDescription)
+                        .frame(height: 120)
                         .padding()
-                        .background(Color.green)
-                        .foregroundColor(.white)
+                        .background(Color.white)
                         .cornerRadius(12)
                         .padding(.horizontal)
-                        .alert("CWO Submitted", isPresented: $showAlert) {
-                            Button("OK") { dismiss() }
+
+                    // Parts Required
+                    Text("Parts Required:")
+                        .foregroundColor(.white)
+                        .bold()
+                        .padding(.horizontal)
+
+                    ForEach(partsManager.selectedParts, id: \.id) { part in
+                        Text("\(part.name) - \(part.number)")
+                            .foregroundColor(.white)
+                            .padding(.horizontal)
+                    }
+
+                    // Attach Image
+                    Text("Attach Image:")
+                        .foregroundColor(.white)
+                        .bold()
+                        .padding(.horizontal)
+
+                    PhotosPicker(selection: $selectedItem, matching: .images) {
+                        Text("Choose Image")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.orange)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                            .padding(.horizontal)
+                    }
+                    .onChange(of: selectedItem) { newItem in
+                        Task {
+                            if let data = try? await newItem?.loadTransferable(type: Data.self),
+                               let uiImage = UIImage(data: data) {
+                                selectedImage = uiImage
+                            }
                         }
                     }
+
+                    if let image = selectedImage {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFit()
+                            .cornerRadius(10)
+                            .padding(.horizontal)
+                    }
+
+                    // Submit Button
+                    Button(action: {
+                        submitCWO()
+                    }) {
+                        Text("Submit CWO")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.green)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+                    .padding(.horizontal)
                     .padding(.bottom, 40)
                 }
             }
-            .navigationBarHidden(true)
+        }
+    }
+
+    func submitCWO() {
+        // Your logic to save or send the CWO
+        print("Submitted work description: \(workDescription)")
+        print("Selected parts: \(partsManager.selectedParts.count)")
+        if selectedImage != nil {
+            print("Image attached.")
         }
     }
 }
