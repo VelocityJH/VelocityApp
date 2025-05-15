@@ -4,6 +4,8 @@ final class SparePartManager: ObservableObject {
     static let shared = SparePartManager()
 
     @Published var allParts: [SparePart]
+    @Published var availableParts: [SparePart]
+    @Published var selectedParts: [SparePart]
 
     private init() {
         self.allParts = [
@@ -12,5 +14,18 @@ final class SparePartManager: ObservableObject {
             SparePart(name: "Control Panel", number: "789-GHI", location: "Zone C", stock: 0),
             SparePart(name: "Gearbox Assembly", number: "321-JKL", location: "Zone D", stock: 3)
         ]
+
+        self.availableParts = allParts
+        self.selectedParts = []
+    }
+
+    // Optional: Reset selected parts (after job complete)
+    func clearSelectedParts() {
+        selectedParts.removeAll()
+    }
+
+    // Optional: Filter parts with stock only (useful for MVP)
+    var inStockParts: [SparePart] {
+        allParts.filter { $0.stock > 0 }
     }
 }
