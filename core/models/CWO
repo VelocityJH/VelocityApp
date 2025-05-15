@@ -1,0 +1,14 @@
+// Models/CWO.swift
+import Foundation
+import SwiftUI
+
+struct CWO: Identifiable, Codable {
+    let id: UUID
+    let reporter: String
+    let area: String
+    let zone: String
+    let workDetails: String
+    let dateSubmitted: Date
+    var imageName: String?
+    var partsRequired: [SparePart]
+}
