@@ -1,76 +1,135 @@
+//
+//  CWOCreationView.swift
+//  Velocity
+//
+//  Updated by Code Copilot
+
 import SwiftUI
+import PhotosUI
 
 struct CWOCreationView: View {
-    @Environment(\.dismiss) var dismiss
-
-    @State private var area: String = ""
+    @Environment(\.dismiss) private var dismiss
     @State private var zone: String = ""
-    @State private var workDetails: String = ""
-    @State private var selectedParts: [SparePart] = []
-    @State private var showImagePicker = false
-    @State private var selectedImage: UIImage?
+    @State private var equipment: String = ""
+    @State private var workDescription: String = ""
+    @State private var requiredParts: String = ""
+    @State private var selectedImage: UIImage? = nil
+    @State private var selectedItem: PhotosPickerItem? = nil
+    @State private var showAlert = false
 
     var body: some View {
-        ZStack {
-            StandardBackgroundView().ignoresSafeArea()
+        NavigationStack {
+            ZStack {
+                Color(red: 0.0235, green: 0.1843, blue: 0.2941)
+                    .ignoresSafeArea()
 
-            ScrollView {
-                VStack(spacing: 16) {
-                    TopNavBar(
-                        title: "CWO Creation",
-                        onBack: { dismiss() },
-                        onHome: { dismiss() }
-                    )
+                ScrollView {
+                    VStack(spacing: 20) {
+                        HStack {
+                            Button(action: { dismiss() }) {
+                                Image(systemName: "arrow.left")
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .background(Color.blue.opacity(0.7))
+                                    .clipShape(Circle())
+                            }
 
-                    TextField("Enter Area", text: $area)
-                        .textFieldStyle(.roundedBorder)
+                            Spacer()
 
-                    TextField("Enter Zone", text: $zone)
-                        .textFieldStyle(.roundedBorder)
+                            NavigationLink(destination: HomeView()) {
+                                Image(systemName: "house.fill")
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .background(Color.blue.opacity(0.7))
+                                    .clipShape(Circle())
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.top, 60)
 
-                    Text("Work to be done:")
-                        .bold()
+                        Text("Create CWO Request")
+                            .font(.largeTitle)
+                            .foregroundColor(.white)
+
+                        Button("Scan QR Code") {
+                            // TODO: Hook up QR scanner to fill zone + equipment
+                        }
+                        .padding()
+                        .background(Color.gray.opacity(0.3))
+                        .cornerRadius(10)
                         .foregroundColor(.white)
 
-                    TextEditor(text: $workDetails)
-                        .frame(height: 100)
-                        .background(Color.white)
-                        .cornerRadius(10)
-
-                    Button("Take Image of Issue") {
-                        showImagePicker = true
-                    }
-                    .foregroundColor(.blue)
-
-                    NavigationLink(destination: SelectPartsView(
-                        allParts: SparePartManager.shared.allParts,
-                        onSelection: { selected in
-                            self.selectedParts = selected
+                        Group {
+                            TextField("Zone", text: $zone)
+                            TextField("Equipment", text: $equipment)
                         }
-                    )) {
-                        Text("Select Parts Required")
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
-                    }
+                        .textFieldStyle(.roundedBorder)
+                        .padding(.horizontal)
 
-                    Button("Submit CWO") {
-                        submitCWO()
+                        TextField("Brief Work Description", text: $workDescription, axis: .vertical)
+                            .textFieldStyle(.roundedBorder)
+                            .padding(.horizontal)
+                            .lineLimit(3...5)
+
+                        TextField("Parts Required", text: $requiredParts, axis: .vertical)
+                            .textFieldStyle(.roundedBorder)
+                            .padding(.horizontal)
+                            .lineLimit(2...4)
+
+                        PhotosPicker(selection: $selectedItem, matching: .images) {
+                            Text("Attach Image")
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.orange)
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                        }
+                        .padding(.horizontal)
+                        .onChange(of: selectedItem) { newItem in
+                            Task {
+                                if let data = try? await newItem?.loadTransferable(type: Data.self),
+                                   let uiImage = UIImage(data: data) {
+                                    selectedImage = uiImage
+                                }
+                            }
+                        }
+
+                        if let image = selectedImage {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(maxWidth: 300)
+                                .cornerRadius(12)
+                                .padding(.bottom)
+                        }
+
+                        Button("Submit CWO Request") {
+                            let imageData = selectedImage?.jpegData(compressionQuality: 0.8)
+                            let newCWO = CWORequest(
+                                zone: zone,
+                                equipment: equipment,
+                                description: workDescription,
+                                parts: requiredParts,
+                                imageData: imageData,
+                                submittedBy: UserManager.shared.username
+                            )
+                            CWOManager.shared.submit(newCWO)
+                            showAlert = true
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                        .padding(.horizontal)
+                        .alert("CWO Submitted", isPresented: $showAlert) {
+                            Button("OK") { dismiss() }
+                        }
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.green)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
+                    .padding(.bottom, 40)
                 }
-                .padding()
             }
+            .navigationBarHidden(true)
         }
-    }
-
-    private func submitCWO() {
-        print("Submitted CWO for area: \(area), zone: \(zone)")
     }
 }
