@@ -1,5 +1,4 @@
 import SwiftUI
-import SwiftUI
 
 struct CompletedJobsView: View {
     @Environment(\.dismiss) var dismiss
@@ -33,12 +32,12 @@ struct CompletedJobsView: View {
                                     if let end = breakdown.endTime {
                                         let duration = Int(end.timeIntervalSince(breakdown.timeSubmitted) / 60)
                                         Text("Duration: \(duration) mins")
-                                            .foregroundColor(.gray)
+                                            .foregroundColor(duration > 15 ? .red : .gray)
                                     }
 
-                                    // Optional: View summary (for future one-pager)
+                                    // Optional future: View Summary button
                                     Button("View Summary") {
-                                        // TODO: Future feature
+                                        // TODO: Show or export summary
                                     }
                                     .font(.caption)
                                     .foregroundColor(.blue)
