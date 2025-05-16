@@ -65,13 +65,14 @@ struct LoginView: View {
     }
 
     private func handleLogin() {
-        // Basic dummy check
         if username.lowercased() == "j" && password == "a" {
-            UserManager.shared.logIn(user: username) // Correctly set the username
+            UserManager.shared.logIn(user: username)
+            print("Username after login: \(UserManager.shared.username)")
             loginFailed = false
             showHome = true
         } else {
             loginFailed = true
+            print("❌ Login failed")
         }
     }
 }
