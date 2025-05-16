@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftUI
 
 struct CompletedJobsView: View {
     @Environment(\.dismiss) var dismiss
@@ -17,7 +18,7 @@ struct CompletedJobsView: View {
 
                 ScrollView {
                     if breakdownManager.completedBreakdowns.isEmpty {
-                        Text("No completed jobs!")
+                        Text("No completed jobs")
                             .foregroundColor(.white)
                             .padding(.top, 20)
                     } else {
