@@ -1,12 +1,17 @@
 import SwiftUI
 
 struct OpenJobsView: View {
+    @Environment(\.dismiss) var dismiss
     @ObservedObject var breakdownManager = BreakdownManager.shared
 
     var body: some View {
         StandardBackgroundView {
             VStack(spacing: 0) {
-                TopNavBar(title: "Open Jobs")
+                TopNavBar(
+                    title: "Open Jobs",
+                    onBack: { dismiss() },
+                    onHome: { dismiss() }
+                )
 
                 ScrollView {
                     VStack(spacing: 16) {
