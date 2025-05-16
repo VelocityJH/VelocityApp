@@ -7,8 +7,7 @@ struct OpenJobsView: View {
 
     var body: some View {
         ZStack {
-            StandardBackgroundView()
-                .ignoresSafeArea()
+            StandardBackgroundView().ignoresSafeArea()
 
             VStack(spacing: 0) {
                 TopNavBar(
@@ -32,22 +31,30 @@ struct OpenJobsView: View {
                     ScrollView {
                         VStack(spacing: 16) {
                             ForEach(breakdownManager.openBreakdowns) { breakdown in
-                                let isJoined = breakdown.joinedEngineers.contains(userManager.username)
                                 let isOwner = breakdown.submittedBy == userManager.username
+                                let isJoined = breakdown.joinedEngineers.contains(userManager.username)
 
                                 VStack(alignment: .leading, spacing: 8) {
                                     Text("Zone: \(breakdown.zone)").bold()
                                     Text("Equipment: \(breakdown.equipment)")
                                     Text("Submitted by: \(breakdown.submittedBy)")
-
-                                    // Downtime + emoji
+                                    
                                     HStack {
                                         Text("Downtime: \(breakdown.downtime) mins")
                                         Text(downtimeEmoji(for: breakdown.downtime))
                                     }
 
-                                    // Join Job Button
-                                    if !isJoined && !isOwner {
+                                    // Show control/join options
+                                    if isOwner || isJoined {
+                                        NavigationLink(destination: BreakdownControlView(breakdown: breakdown)) {
+                                            Text("Control Job")
+                                                .frame(maxWidth: .infinity)
+                                                .padding()
+                                                .background(Color.blue)
+                                                .foregroundColor(.white)
+                                                .cornerRadius(8)
+                                        }
+                                    } else {
                                         Button("Join Job") {
                                             breakdownManager.joinJob(breakdown: breakdown)
                                         }
@@ -57,24 +64,6 @@ struct OpenJobsView: View {
                                         .foregroundColor(.white)
                                         .cornerRadius(8)
                                     }
-
-                                    // Control Job
-                                    if isJoined || isOwner {
-                                        NavigationLink(destination: BreakdownControlView(breakdown: breakdown)) {
-                                            Text("Control Job")
-                                                .frame(maxWidth: .infinity)
-                                                .padding()
-                                                .background(Color.blue)
-                                                .foregroundColor(.white)
-                                                .cornerRadius(8)
-                                        }
-                                    }
-
-                                    // Debug info
-                                    Text("Joined: \(breakdown.joinedEngineers.joined(separator: ", "))")
-                                        .font(.caption)
-                                        .foregroundColor(.gray)
-
                                 }
                                 .padding()
                                 .frame(maxWidth: .infinity, alignment: .leading)
