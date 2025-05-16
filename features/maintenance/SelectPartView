@@ -1,129 +1,77 @@
 import SwiftUI
 
-struct BreakdownControlView: View {
+struct SelectPartsView: View {
+    let allParts: [SparePart]
+    let onSelection: (SparePart) -> Void
+
     @Environment(\.dismiss) var dismiss
-    var breakdown: Breakdown
-    
-    @State private var showSupportPopup = false
-    @State private var selectedSupportTeam: String?
-    @State private var showRectificationPrompt = false
-    @State private var rectificationText = ""
-    
+    @State private var searchText = ""
+    @State private var selectedPart: SparePart?
+
+    var filteredParts: [SparePart] {
+        if searchText.isEmpty {
+            return allParts
+        } else {
+            return allParts.filter {
+                $0.name.localizedCaseInsensitiveContains(searchText) ||
+                $0.number.localizedCaseInsensitiveContains(searchText)
+            }
+        }
+    }
+
     var body: some View {
-        ZStack {
-            StandardBackgroundView().ignoresSafeArea()
-            
-            ScrollView {
-                TopNavBar(title: "Breakdown Control", onBack: { dismiss() }, onHome: { dismiss() })
-                
+        StandardBackgroundView().ignoresSafeArea()
+            VStack(spacing: 0) {
+                TopNavBar(title: "Select Parts",
+                          onBack: { dismiss() },
+                          onHome: { dismiss() }
+                )
+
+                // Search Bar
+                TextField("Search by name or number", text: $searchText)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.horizontal)
+                    .padding(.vertical, 10)
+
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 20) {
-                        // Breakdown info
-                        Group {
-                            Text("Zone: \(breakdown.zone)")
-                            Text("Equipment: \(breakdown.equipment)")
-                            Text("Reported: \(breakdown.timeSubmitted.formatted(.dateTime.hour().minute()))")
-                        }
-                        .foregroundColor(.white)
-                        .padding(.horizontal)
-                        
-                        // 1. Spare Parts Selection
-                        NavigationLink(destination:
-                                        SelectPartsView(
-                                            allParts: SparePartManager.shared.availableParts,
-                                            onSelection: { selected in
-                                                SparePartManager.shared.selectedParts.append(selected)
-                                            }
-                                        )
-                        ) {
-                            Text("Go to Spare Parts")
-                                .frame(maxWidth: .infinity)
+                    VStack(spacing: 12) {
+                        ForEach(filteredParts) { part in
+                            Button(action: {
+                                selectedPart = part
+                            }) {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    Text(part.name).bold()
+                                    Text("Number: \(part.number)")
+                                    Text("Location: \(part.location)")
+                                    Text("Stock: \(part.stock)")
+                                }
                                 .padding()
-                                .background(Color.white)
-                                .cornerRadius(10)
-                        }
-                        .padding(.horizontal)
-                        
-                        //Display Selected PARTS\
-                        if SparePartManager.shared.selectedParts.isEmpty {
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text("Selected Parts:")
-                                    .font(.headline)
-                                    .padding()
-                                    .background(Color.white)
-                                    .cornerRadius(10)
-                                
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(selectedPart?.id == part.id ? Color.green : Color.white)
+                                .foregroundColor(.black)
+                                .cornerRadius(12)
+                                .shadow(radius: 1)
                             }
                             .padding(.horizontal)
-                            ForEach(SparePartManager.shared.selectedParts) { part in
-                                VStack(alignment: .leading) {
-                                    Text(part.name)
-                                        .foregroundColor(.white)
-                                    Text("Qty: 1")
-                                        .font(.caption)
-                                        .foregroundColor(.gray)
-                                }
-                                .padding(8)
-                                .background(Color.black.aopacity(0.2))
-                                .cornerRadius(8)
-                            }
-                        }.padding(.horizontal)
+                        }
                     }
-                    
-                    
-                    // 2. Request Support
-                    Button("Request Support") {
-                        showSupportPopup = true
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.orange)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                    .padding(.horizontal)
-                    
-                    // 3. Fault Trees & Manuals
-                    Button("Open Fault Trees & Manuals") {
-                        // Placeholder for future OCR/manual logic
+                    .padding(.top, 10)
+                }
+
+                // Confirm Selection Button
+                if let confirmed = selectedPart {
+                    Button("Select Part") {
+                        onSelection(confirmed)
+                        dismiss()
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(Color.blue)
                     .foregroundColor(.white)
-                    .cornerRadius(10)
-                    .padding(.horizontal)
-                    
-                    // 4. Complete Job Button
-                    Button("✅ Complete Job") {
-                        showRectificationPrompt = true
-                    }
-                    .frame(height: 50)
-                    .frame(maxWidth: .infinity)
-                    .background(Color.green)
-                    .foregroundColor(.white)
                     .cornerRadius(12)
-                    .padding(.horizontal)
+                    .padding()
                 }
-                .padding(.bottom, 40)
             }
         }
     }
-    // Support popup
-        .confirmationDialog("Who do you request?", isPresented: $showSupportPopup) {
-            Button("Riv Techs") { selectedSupportTeam = "Riv Techs" }
-            Button("Controls") { selectedSupportTeam = "Controls" }
-            Button("Cancel", role: .cancel) {}
-        }
-    
-    // Rectification prompt
-        .alert("How did you rectify the issue?", isPresented: $showRectificationPrompt) {
-            TextField("Enter details...", text: $rectificationText)
-            Button("Submit") {
-                // Simulated job close logic
-                SparePartManager.shared.clearSelectedParts()
-                dismiss()
-            }
-            Button("Cancel", role: .cancel) {}
-        }
-        .navigationBarHidden(true)
-}
+
