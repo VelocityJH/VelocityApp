@@ -37,19 +37,24 @@ struct OpenJobsView: View {
                                     Text("Equipment: \(breakdown.equipment)")
                                     Text("Submitted by: \(breakdown.submittedBy)")
 
-                                    // Downtime + emoji
                                     HStack {
                                         Text("Downtime: \(breakdown.downtime) mins")
                                         Text(downtimeEmoji(for: breakdown.downtime))
                                     }
 
-                                    // Join Job button
-                                    Button("Join Job") {
-                                        breakdownManager.joinJob(breakdown: breakdown)
+                                    // JOIN JOB button
+                                    if !breakdown.joinedEngineers.contains(userManager.username) {
+                                        Button("Join Job") {
+                                            breakdownManager.joinJob(breakdown: breakdown)
+                                        }
+                                        .buttonStyle(.borderedProminent)
+                                    } else {
+                                        Text("You have joined this job.")
+                                            .font(.caption)
+                                            .foregroundColor(.green)
                                     }
-                                    .buttonStyle(.borderedProminent)
 
-                                    // Control Breakdown (only if user joined)
+                                    // CONTROL BREAKDOWN
                                     if breakdown.joinedEngineers.contains(userManager.username) {
                                         NavigationLink(destination: BreakdownControlView(breakdown: breakdown)) {
                                             Text("Control Breakdown")
