@@ -8,6 +8,7 @@ struct BreakdownControlView: View {
     @State private var selectedSupportTeam: String?
     @State private var showRectificationPrompt = false
     @State private var rectificationText = ""
+    @State private var selectedParts: [SparePart] = []
 
     var body: some View {
         ZStack {
@@ -27,15 +28,11 @@ struct BreakdownControlView: View {
                         .foregroundColor(.white)
                         .padding(.horizontal)
 
-                        // Go to Spare Parts
+                        // Spare Parts Selector
                         NavigationLink(destination:
                             SelectPartsView(
                                 allParts: SparePartManager.shared.availableParts,
-                                onSelection: { selected in
-                                    if !SparePartManager.shared.selectedParts.contains(where: { $0.id == selected.id }) {
-                                        SparePartManager.shared.selectedParts.append(selected)
-                                    }
-                                }
+                                selectedParts: $selectedParts
                             )
                         ) {
                             Text("Go to Spare Parts")
@@ -46,20 +43,32 @@ struct BreakdownControlView: View {
                         }
                         .padding(.horizontal)
 
-                        // Selected Parts
-                        if !SparePartManager.shared.selectedParts.isEmpty {
-                            VStack(alignment: .leading, spacing: 6) {
+                        // Selected Parts (local to this breakdown)
+                        if !selectedParts.isEmpty {
+                            VStack(alignment: .leading, spacing: 8) {
                                 Text("Selected Parts:")
                                     .font(.headline)
                                     .foregroundColor(.white)
 
-                                ForEach(SparePartManager.shared.selectedParts) { part in
-                                    VStack(alignment: .leading) {
-                                        Text(part.name)
-                                            .foregroundColor(.white)
-                                        Text("Qty: 1")
-                                            .font(.caption)
-                                            .foregroundColor(.gray)
+                                ForEach(selectedParts) { part in
+                                    HStack {
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(part.name)
+                                                .foregroundColor(.white)
+                                            Text("Location: \(part.location)")
+                                                .font(.caption)
+                                                .foregroundColor(.gray)
+                                            Text("Qty: 1")
+                                                .font(.caption2)
+                                                .foregroundColor(.gray)
+                                        }
+                                        Spacer()
+                                        Button(action: {
+                                            selectedParts.removeAll(where: { $0.id == part.id })
+                                        }) {
+                                            Image(systemName: "trash")
+                                                .foregroundColor(.red)
+                                        }
                                     }
                                     .padding(8)
                                     .background(Color.black.opacity(0.2))
@@ -82,7 +91,7 @@ struct BreakdownControlView: View {
 
                         // Fault Trees & Manuals
                         Button("Open Fault Trees & Manuals") {
-                            // Placeholder for manual/AI popup
+                            // Future OCR/manuals feature
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -118,8 +127,8 @@ struct BreakdownControlView: View {
         .alert("How did you rectify the issue?", isPresented: $showRectificationPrompt) {
             TextField("Enter details...", text: $rectificationText)
             Button("Submit") {
-                // Simulated job close logic
-                SparePartManager.shared.clearSelectedParts()
+                // Simulate job completion
+                selectedParts.removeAll()
                 dismiss()
             }
             Button("Cancel", role: .cancel) {}
