@@ -5,43 +5,47 @@ struct LoginView: View {
     @State private var password: String = ""
     @State private var showHome = false
     @State private var loginFailed = false
-
+    @State private var enteredUsername: String = ""
+    
+    
     var body: some View {
         NavigationStack {
             ZStack {
                 Color("AppBackground").ignoresSafeArea()
-
+                
                 VStack(spacing: 30) {
                     Spacer()
-
+                    
                     VStack(spacing: 12) {
-                        Image("VelocityLogo")
+                        Image("AppLogo")
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 100, height: 100)
-
+                            .frame(width: 180, height: 180)
+                        
                         Text("Welcome to Velocity")
                             .font(.headline)
                             .foregroundColor(.white)
                     }
-
+                    
                     VStack(spacing: 16) {
                         TextField("Username", text: $username)
                             .padding()
                             .background(Color.white)
                             .cornerRadius(8)
-
+                            .foregroundColor(.black)
+                        
                         SecureField("Password", text: $password)
                             .padding()
                             .background(Color.white)
                             .cornerRadius(8)
-
+                            .foregroundColor(.black)
+                        
                         if loginFailed {
                             Text("Login failed. Try again.")
                                 .foregroundColor(.red)
                         }
-
-                        Button(action: handleLogin) {
+                        
+                        Button(action: handleLogin){
                             Text("Log In")
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
@@ -51,27 +55,29 @@ struct LoginView: View {
                         }
                     }
                     .padding(.horizontal)
-
+                    
                     Spacer()
                 }
-
+                
                 NavigationLink(destination: HomeView(), isActive: $showHome) {
                     EmptyView()
                 }
             }
         }
     }
-
+    
     private func handleLogin() {
-        if username.lowercased() == "james" && password == "admin123" {
+        if username.lowercased() == "j" && password == "a" {
+            UserManager.shared.logIn(user: enteredUsername)
             loginFailed = false
             showHome = true
         } else {
             loginFailed = true
         }
+        if UserManager.shared.isLoggedIn {
+            HomeView()
+        } else {
+            LoginView()
+        }
     }
-}
-
-#Preview {
-    LoginView()
 }
