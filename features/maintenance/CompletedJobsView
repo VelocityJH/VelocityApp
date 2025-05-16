@@ -1,50 +1,58 @@
 import SwiftUI
 
 struct CompletedJobsView: View {
-    @ObservedObject private var manager = BreakdownManager.shared
+    @Environment(\.dismiss) var dismiss
+    @ObservedObject var breakdownManager = BreakdownManager.shared
 
     var body: some View {
-        StandardBackgroundView {
+        ZStack {
+            StandardBackgroundView().ignoresSafeArea()
+
             VStack(spacing: 0) {
-                TopNavBar(title: "Completed Jobs")
+                TopNavBar(
+                    title: "Completed Jobs",
+                    onBack: { dismiss() },
+                    onHome: { dismiss() }
+                )
 
                 ScrollView {
-                    VStack(spacing: 16) {
-                        ForEach(manager.completedBreakdowns) { job in
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text("Zone: \(job.zone)").bold()
-                                Text("Equipment: \(job.equipment)")
-                                Text("Completed by: \(job.completedBy ?? "N/A")")
-                                Text("Duration: \(formattedDuration(from: job.timeSubmitted, to: job.endTime))")
-                                    .font(.caption)
-                                    .foregroundColor(.gray)
-                            }
-                            .padding()
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color.white)
-                            .cornerRadius(12)
-                            .shadow(radius: 1)
-                            .padding(.horizontal)
-                        }
+                    if breakdownManager.completedBreakdowns.isEmpty {
+                        Text("No completed jobs!")
+                            .foregroundColor(.white)
+                            .padding(.top, 20)
+                    } else {
+                        VStack(spacing: 16) {
+                            ForEach(breakdownManager.completedBreakdowns) { breakdown in
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("Zone: \(breakdown.zone)").bold()
+                                    Text("Equipment: \(breakdown.equipment)")
+                                    Text("Submitted by: \(breakdown.submittedBy)")
+                                    Text("Completed by: \(breakdown.completedBy ?? "Unknown")")
 
-                        if manager.completedBreakdowns.isEmpty {
-                            Text("No completed jobs yet.")
-                                .foregroundColor(.white)
-                                .padding(.top, 40)
+                                    if let end = breakdown.endTime {
+                                        let duration = Int(end.timeIntervalSince(breakdown.timeSubmitted) / 60)
+                                        Text("Duration: \(duration) mins")
+                                            .foregroundColor(.gray)
+                                    }
+
+                                    // Optional: View summary (for future one-pager)
+                                    Button("View Summary") {
+                                        // TODO: Future feature
+                                    }
+                                    .font(.caption)
+                                    .foregroundColor(.blue)
+                                }
+                                .padding()
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(Color.black.opacity(0.2))
+                                .cornerRadius(12)
+                                .padding(.horizontal)
+                            }
                         }
+                        .padding(.top)
                     }
-                    .padding(.top)
                 }
             }
         }
-    }
-
-    // Helper to calculate duration
-    func formattedDuration(from start: Date, to end: Date?) -> String {
-        guard let end = end else { return "—" }
-        let interval = Int(end.timeIntervalSince(start))
-        let minutes = interval / 60
-        let seconds = interval % 60
-        return "\(minutes)m \(seconds)s"
     }
 }
