@@ -29,18 +29,15 @@ struct CompletedJobsView: View {
                                     Text("Submitted by: \(breakdown.submittedBy)")
                                     Text("Completed by: \(breakdown.completedBy ?? "Unknown")")
 
+                                    if let rect = breakdown.rectificationText {
+                                        Text("Fix: \(rect)").italic()
+                                    }
+
                                     if let end = breakdown.endTime {
                                         let duration = Int(end.timeIntervalSince(breakdown.timeSubmitted) / 60)
                                         Text("Duration: \(duration) mins")
-                                            .foregroundColor(duration > 15 ? .red : .gray)
+                                            .foregroundColor(.gray)
                                     }
-
-                                    // Optional future: View Summary button
-                                    Button("View Summary") {
-                                        // TODO: Show or export summary
-                                    }
-                                    .font(.caption)
-                                    .foregroundColor(.blue)
                                 }
                                 .padding()
                                 .frame(maxWidth: .infinity, alignment: .leading)
