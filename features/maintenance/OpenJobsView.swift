@@ -5,7 +5,10 @@ struct OpenJobsView: View {
     @ObservedObject var breakdownManager = BreakdownManager.shared
 
     var body: some View {
-        StandardBackgroundView {
+        ZStack {
+            StandardBackgroundView()
+                .ignoresSafeArea()
+
             VStack(spacing: 0) {
                 TopNavBar(
                     title: "Open Jobs",
@@ -13,38 +16,45 @@ struct OpenJobsView: View {
                     onHome: { dismiss() }
                 )
 
-                ScrollView {
-                    VStack(spacing: 16) {
-                        ForEach(breakdownManager.openBreakdowns) { breakdown in
-                            NavigationLink(destination: BreakdownControlView(breakdown: breakdown)) {
-                                VStack(alignment: .leading, spacing: 6) {
-                                    Text("Zone: \(breakdown.zone)").bold()
-                                    Text("Equipment: \(breakdown.equipment)")
-                                    Text("Submitted by: \(breakdown.submittedBy)")
-                                    Text("Downtime: \(breakdown.downtime) mins")
-                                }
-                                .padding()
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .background(cardColor(for: breakdown.downtime))
-                                .cornerRadius(10)
-                                .shadow(radius: 1)
-                            }
-                            .padding(.horizontal)
-                        }
-
-                        if breakdownManager.openBreakdowns.isEmpty {
+                if breakdownManager.openBreakdowns.isEmpty {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 8) {
                             Text("No open jobs!")
                                 .foregroundColor(.white)
-                                .padding(.top, 40)
+                                .padding(.top, 20)
+                                .padding(.horizontal)
+                            Spacer()
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                    .padding(.top)
+                } else {
+                    ScrollView {
+                        VStack(spacing: 16) {
+                            ForEach(breakdownManager.openBreakdowns) { breakdown in
+                                NavigationLink(destination: BreakdownControlView(breakdown: breakdown)) {
+                                    VStack(alignment: .leading, spacing: 6) {
+                                        Text("Zone: \(breakdown.zone)").bold()
+                                        Text("Equipment: \(breakdown.equipment)")
+                                        Text("Submitted by: \(breakdown.submittedBy)")
+                                        Text("Downtime: \(breakdown.downtime) mins")
+                                    }
+                                    .padding()
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .background(cardColor(for: breakdown.downtime))
+                                    .cornerRadius(10)
+                                    .shadow(radius: 2)
+                                }
+                                .padding(.horizontal)
+                            }
+                        }
+                        .padding(.top)
+                    }
                 }
             }
         }
     }
 
-    func cardColor(for downtime: Int) -> Color {
+    private func cardColor(for downtime: Int) -> Color {
         switch downtime {
         case 0..<15:
             return Color.green.opacity(0.3)
