@@ -3,22 +3,22 @@ import SwiftUI
 struct BreakdownControlView: View {
     @Environment(\.dismiss) var dismiss
     var breakdown: Breakdown
-    
+
     @State private var showSupportPopup = false
     @State private var selectedSupportTeam: String?
     @State private var showRectificationPrompt = false
     @State private var rectificationText = ""
-    
+
     var body: some View {
         ZStack {
             StandardBackgroundView().ignoresSafeArea()
-            
+
             ScrollView {
-                TopNavBar(title: "Breakdown Control", onBack: { dismiss() }, onHome: { dismiss() })
-                
-                ScrollView {
+                VStack(spacing: 0) {
+                    TopNavBar(title: "Breakdown Control", onBack: { dismiss() }, onHome: { dismiss() })
+
                     VStack(alignment: .leading, spacing: 20) {
-                        // Breakdown info
+                        // Breakdown Info
                         Group {
                             Text("Zone: \(breakdown.zone)")
                             Text("Equipment: \(breakdown.equipment)")
@@ -26,15 +26,17 @@ struct BreakdownControlView: View {
                         }
                         .foregroundColor(.white)
                         .padding(.horizontal)
-                        
-                        // 1. Spare Parts Selection
+
+                        // Go to Spare Parts
                         NavigationLink(destination:
-                                        SelectPartsView(
-                                            allParts: SparePartManager.shared.availableParts,
-                                            onSelection: { selected in
-                                                SparePartManager.shared.selectedParts.append(selected)
-                                            }
-                                        )
+                            SelectPartsView(
+                                allParts: SparePartManager.shared.availableParts,
+                                onSelection: { selected in
+                                    if !SparePartManager.shared.selectedParts.contains(where: { $0.id == selected.id }) {
+                                        SparePartManager.shared.selectedParts.append(selected)
+                                    }
+                                }
+                            )
                         ) {
                             Text("Go to Spare Parts")
                                 .frame(maxWidth: .infinity)
@@ -43,79 +45,76 @@ struct BreakdownControlView: View {
                                 .cornerRadius(10)
                         }
                         .padding(.horizontal)
-                        
-                        //Display Selected PARTS\
-                        if SparePartManager.shared.selectedParts.isEmpty {
+
+                        // Selected Parts
+                        if !SparePartManager.shared.selectedParts.isEmpty {
                             VStack(alignment: .leading, spacing: 6) {
                                 Text("Selected Parts:")
                                     .font(.headline)
-                                    .padding()
-                                    .background(Color.white)
-                                    .cornerRadius(10)
-                                
+                                    .foregroundColor(.white)
+
+                                ForEach(SparePartManager.shared.selectedParts) { part in
+                                    VStack(alignment: .leading) {
+                                        Text(part.name)
+                                            .foregroundColor(.white)
+                                        Text("Qty: 1")
+                                            .font(.caption)
+                                            .foregroundColor(.gray)
+                                    }
+                                    .padding(8)
+                                    .background(Color.black.opacity(0.2))
+                                    .cornerRadius(8)
+                                }
                             }
                             .padding(.horizontal)
-                            ForEach(SparePartManager.shared.selectedParts) { part in
-                                VStack(alignment: .leading) {
-                                    Text(part.name)
-                                        .foregroundColor(.white)
-                                    Text("Qty: 1")
-                                        .font(.caption)
-                                        .foregroundColor(.gray)
-                                }
-                                .padding(8)
-                                .background(Color.black.aopacity(0.2))
-                                .cornerRadius(8)
-                            }
-                        }.padding(.horizontal)
+                        }
+
+                        // Request Support
+                        Button("Request Support") {
+                            showSupportPopup = true
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.orange)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                        .padding(.horizontal)
+
+                        // Fault Trees & Manuals
+                        Button("Open Fault Trees & Manuals") {
+                            // Placeholder for manual/AI popup
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                        .padding(.horizontal)
+
+                        // Complete Job
+                        Button("✅ Complete Job") {
+                            showRectificationPrompt = true
+                        }
+                        .frame(height: 50)
+                        .frame(maxWidth: .infinity)
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                        .padding(.horizontal)
                     }
-                    
-                    
-                    // 2. Request Support
-                    Button("Request Support") {
-                        showSupportPopup = true
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.orange)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                    .padding(.horizontal)
-                    
-                    // 3. Fault Trees & Manuals
-                    Button("Open Fault Trees & Manuals") {
-                        // Placeholder for future OCR/manual logic
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                    .padding(.horizontal)
-                    
-                    // 4. Complete Job Button
-                    Button("✅ Complete Job") {
-                        showRectificationPrompt = true
-                    }
-                    .frame(height: 50)
-                    .frame(maxWidth: .infinity)
-                    .background(Color.green)
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
-                    .padding(.horizontal)
+                    .padding(.top)
+                    .padding(.bottom, 40)
                 }
-                .padding(.bottom, 40)
             }
         }
-    }
-    // Support popup
+        // Support popup
         .confirmationDialog("Who do you request?", isPresented: $showSupportPopup) {
             Button("Riv Techs") { selectedSupportTeam = "Riv Techs" }
             Button("Controls") { selectedSupportTeam = "Controls" }
             Button("Cancel", role: .cancel) {}
         }
-    
-    // Rectification prompt
+
+        // Rectification alert
         .alert("How did you rectify the issue?", isPresented: $showRectificationPrompt) {
             TextField("Enter details...", text: $rectificationText)
             Button("Submit") {
@@ -125,5 +124,7 @@ struct BreakdownControlView: View {
             }
             Button("Cancel", role: .cancel) {}
         }
+
         .navigationBarHidden(true)
+    }
 }
