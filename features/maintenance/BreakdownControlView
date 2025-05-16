@@ -28,7 +28,7 @@ struct BreakdownControlView: View {
                         .foregroundColor(.white)
                         .padding(.horizontal)
 
-                        // Spare Parts Selector
+                        // Spare Parts Navigation
                         NavigationLink(destination:
                             SelectPartsView(
                                 allParts: SparePartManager.shared.availableParts,
@@ -43,7 +43,7 @@ struct BreakdownControlView: View {
                         }
                         .padding(.horizontal)
 
-                        // Selected Parts (local to this breakdown)
+                        // Selected Parts Display
                         if !selectedParts.isEmpty {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Selected Parts:")
@@ -64,7 +64,7 @@ struct BreakdownControlView: View {
                                         }
                                         Spacer()
                                         Button(action: {
-                                            selectedParts.removeAll(where: { $0.id == part.id })
+                                            selectedParts.removeAll { $0.id == part.id }
                                         }) {
                                             Image(systemName: "trash")
                                                 .foregroundColor(.red)
@@ -89,9 +89,9 @@ struct BreakdownControlView: View {
                         .cornerRadius(10)
                         .padding(.horizontal)
 
-                        // Fault Trees & Manuals
+                        // Fault Trees
                         Button("Open Fault Trees & Manuals") {
-                            // Future OCR/manuals feature
+                            // Placeholder for future feature
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -116,18 +116,21 @@ struct BreakdownControlView: View {
                 }
             }
         }
-        // Support popup
+        // Support Confirmation
         .confirmationDialog("Who do you request?", isPresented: $showSupportPopup) {
             Button("Riv Techs") { selectedSupportTeam = "Riv Techs" }
             Button("Controls") { selectedSupportTeam = "Controls" }
             Button("Cancel", role: .cancel) {}
         }
 
-        // Rectification alert
+        // Rectification Prompt
         .alert("How did you rectify the issue?", isPresented: $showRectificationPrompt) {
             TextField("Enter details...", text: $rectificationText)
             Button("Submit") {
-                // Simulate job completion
+                BreakdownManager.shared.completeJob(
+                    breakdown: breakdown,
+                    rectification: rectificationText
+                )
                 selectedParts.removeAll()
                 dismiss()
             }
