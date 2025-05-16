@@ -36,25 +36,31 @@ struct OpenJobsView: View {
                                     Text("Zone: \(breakdown.zone)").bold()
                                     Text("Equipment: \(breakdown.equipment)")
                                     Text("Submitted by: \(breakdown.submittedBy)")
-
+                                    
+                                    // Downtime + emoji
                                     HStack {
                                         Text("Downtime: \(breakdown.downtime) mins")
                                         Text(downtimeEmoji(for: breakdown.downtime))
                                     }
 
-                                    // JOIN JOB button
+                                    // Debug info (optional)
+                                    Text("Joined: \(breakdown.joinedEngineers.joined(separator: ", "))")
+                                        .font(.caption)
+                                        .foregroundColor(.gray)
+
+                                    // Join job
                                     if !breakdown.joinedEngineers.contains(userManager.username) {
                                         Button("Join Job") {
                                             breakdownManager.joinJob(breakdown: breakdown)
                                         }
                                         .buttonStyle(.borderedProminent)
                                     } else {
-                                        Text("You have joined this job.")
+                                        Text("You’ve joined this job.")
                                             .font(.caption)
                                             .foregroundColor(.green)
                                     }
 
-                                    // CONTROL BREAKDOWN
+                                    // Control Breakdown (if joined)
                                     if breakdown.joinedEngineers.contains(userManager.username) {
                                         NavigationLink(destination: BreakdownControlView(breakdown: breakdown)) {
                                             Text("Control Breakdown")
@@ -62,7 +68,7 @@ struct OpenJobsView: View {
                                         }
                                         .buttonStyle(.bordered)
                                     } else {
-                                        Text("Join the job to control")
+                                        Text("Join to control")
                                             .font(.caption)
                                             .foregroundColor(.gray)
                                     }
