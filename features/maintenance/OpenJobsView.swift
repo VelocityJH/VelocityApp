@@ -32,46 +32,49 @@ struct OpenJobsView: View {
                     ScrollView {
                         VStack(spacing: 16) {
                             ForEach(breakdownManager.openBreakdowns) { breakdown in
+                                let isJoined = breakdown.joinedEngineers.contains(userManager.username)
+                                let isOwner = breakdown.submittedBy == userManager.username
+
                                 VStack(alignment: .leading, spacing: 8) {
                                     Text("Zone: \(breakdown.zone)").bold()
                                     Text("Equipment: \(breakdown.equipment)")
                                     Text("Submitted by: \(breakdown.submittedBy)")
-                                    
+
                                     // Downtime + emoji
                                     HStack {
                                         Text("Downtime: \(breakdown.downtime) mins")
                                         Text(downtimeEmoji(for: breakdown.downtime))
                                     }
 
-                                    // Debug info (optional)
+                                    // Join Job Button
+                                    if !isJoined && !isOwner {
+                                        Button("Join Job") {
+                                            breakdownManager.joinJob(breakdown: breakdown)
+                                        }
+                                        .frame(maxWidth: .infinity)
+                                        .padding()
+                                        .background(Color.orange)
+                                        .foregroundColor(.white)
+                                        .cornerRadius(8)
+                                    }
+
+                                    // Control Job
+                                    if isJoined || isOwner {
+                                        NavigationLink(destination: BreakdownControlView(breakdown: breakdown)) {
+                                            Text("Control Job")
+                                                .frame(maxWidth: .infinity)
+                                                .padding()
+                                                .background(Color.blue)
+                                                .foregroundColor(.white)
+                                                .cornerRadius(8)
+                                        }
+                                    }
+
+                                    // Debug info
                                     Text("Joined: \(breakdown.joinedEngineers.joined(separator: ", "))")
                                         .font(.caption)
                                         .foregroundColor(.gray)
 
-                                    // Join job
-                                    if !breakdown.joinedEngineers.contains(userManager.username) {
-                                        Button("Join Job") {
-                                            breakdownManager.joinJob(breakdown: breakdown)
-                                        }
-                                        .buttonStyle(.borderedProminent)
-                                    } else {
-                                        Text("You’ve joined this job.")
-                                            .font(.caption)
-                                            .foregroundColor(.green)
-                                    }
-
-                                    // Control Breakdown (if joined)
-                                    if breakdown.joinedEngineers.contains(userManager.username) {
-                                        NavigationLink(destination: BreakdownControlView(breakdown: breakdown)) {
-                                            Text("Control Breakdown")
-                                                .frame(maxWidth: .infinity)
-                                        }
-                                        .buttonStyle(.bordered)
-                                    } else {
-                                        Text("Join to control")
-                                            .font(.caption)
-                                            .foregroundColor(.gray)
-                                    }
                                 }
                                 .padding()
                                 .frame(maxWidth: .infinity, alignment: .leading)
