@@ -6,6 +6,7 @@ struct SelectPartsView: View {
 
     @Environment(\.dismiss) var dismiss
     @State private var searchText = ""
+    @State private var selectedPart: SparePart?
 
     var filteredParts: [SparePart] {
         if searchText.isEmpty {
@@ -21,11 +22,7 @@ struct SelectPartsView: View {
     var body: some View {
         StandardBackgroundView {
             VStack(spacing: 0) {
-                TopNavBar(
-                    title: "Select Parts",
-                    onBack: { dismiss() },
-                    onHome: { dismiss() } // You can route this elsewhere later
-                )
+                TopNavBar(title: "Select Parts", onBack: { dismiss() }, onHome: { dismiss() })
 
                 // Search Bar
                 TextField("Search by name or number", text: $searchText)
@@ -37,22 +34,17 @@ struct SelectPartsView: View {
                     VStack(spacing: 12) {
                         ForEach(filteredParts) { part in
                             Button(action: {
-                                onSelection(part)
-                                dismiss()
+                                selectedPart = part
                             }) {
                                 VStack(alignment: .leading, spacing: 6) {
-                                    Text(part.name)
-                                        .font(.headline)
+                                    Text(part.name).bold()
                                     Text("Number: \(part.number)")
-                                        .font(.subheadline)
                                     Text("Location: \(part.location)")
-                                        .font(.subheadline)
                                     Text("Stock: \(part.stock)")
-                                        .font(.caption)
                                 }
                                 .padding()
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .background(Color.white)
+                                .background(selectedPart?.id == part.id ? Color.green : Color.white)
                                 .foregroundColor(.black)
                                 .cornerRadius(12)
                                 .shadow(radius: 1)
@@ -61,6 +53,20 @@ struct SelectPartsView: View {
                         }
                     }
                     .padding(.top, 10)
+                }
+
+                // Confirm Selection Button
+                if let confirmed = selectedPart {
+                    Button("Select Part") {
+                        onSelection(confirmed)
+                        dismiss()
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                    .padding()
                 }
             }
         }
