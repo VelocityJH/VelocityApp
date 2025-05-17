@@ -1,0 +1,35 @@
+import SwiftUI
+
+struct CWOOptionsView: View {
+    @Environment(\.dismiss) var dismiss
+
+    var body: some View {
+        ZStack {
+            StandardBackgroundView().ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                TopNavBar(title: "CWO Options", onBack: { dismiss() }, onHome: { dismiss() })
+
+                ScrollView {
+                    VStack(spacing: 20) {
+                        // Request a new CWO
+                        NavigationLink(destination: CWOCreationView()) {
+                            CWOActionCard(iconName: "plus.circle", title: "Create New CWO")
+                        }
+
+                        // View all pending CWOs
+                        NavigationLink(destination: CWOPendingListView()) {
+                            CWOActionCard(iconName: "doc.text.magnifyingglass", title: "View All CWOs")
+                        }
+
+                        // Future: Completed / Accepted CWOs
+                        NavigationLink(destination: CompletedCWOsView()) {
+                            CWOActionCard(iconName: "checkmark.circle", title: "Accepted CWOs")
+                        }
+                    }
+                    .padding()
+                }
+            }
+        }
+    }
+}
