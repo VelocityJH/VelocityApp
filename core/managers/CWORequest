@@ -1,15 +1,21 @@
 import Foundation
-import UIKit
+import SwiftUI
 
 struct CWORequest: Identifiable, Codable {
     let id: UUID
-    let zone: String
-    let equipment: String
-    let description: String
-    let parts: [SparePart]
-    let imageData: Data?
-    let submittedBy: String
-    let timestamp: Date
+    var zone: String
+    var equipment: String
+    var description: String
+    var parts: [SparePart]
+    var imageData: Data?  // UIImage must be converted to Data before storing
+    var submittedBy: String
+    var timestamp: Date
+    var priority: String  // e.g. "Low", "Medium", "High"
+    var estimatedTime: String  // e.g. "2 hours", "30 mins"
+    
+    var status: String = "Pending"  // New field for manager mode
+    var approvedBy: String?
+    var approvedAt: Date?
 
     init(
         id: UUID = UUID(),
@@ -19,7 +25,9 @@ struct CWORequest: Identifiable, Codable {
         parts: [SparePart],
         imageData: Data?,
         submittedBy: String,
-        timestamp: Date = Date()
+        timestamp: Date = Date(),
+        priority: String = "Medium",
+        estimatedTime: String = ""
     ) {
         self.id = id
         self.zone = zone
@@ -29,5 +37,7 @@ struct CWORequest: Identifiable, Codable {
         self.imageData = imageData
         self.submittedBy = submittedBy
         self.timestamp = timestamp
+        self.priority = priority
+        self.estimatedTime = estimatedTime
     }
 }
