@@ -7,15 +7,16 @@ struct CWORequest: Identifiable, Codable {
     var equipment: String
     var description: String
     var parts: [SparePart]
-    var imageData: Data?  // UIImage must be converted to Data before storing
+    var imageData: Data?  // Image converted to JPEG/PNG
     var submittedBy: String
     var timestamp: Date
     var priority: String  // e.g. "Low", "Medium", "High"
-    var estimatedTime: String  // e.g. "2 hours", "30 mins"
-    
-    var status: String = "Pending"  // New field for manager mode
-    var approvedBy: String?
-    var approvedAt: Date?
+    var estimatedTime: String  // e.g. "30 mins", "2 hours"
+
+    // For manager tracking
+    var status: String = "Pending"         // "Pending", "Approved", "Rejected"
+    var approvedBy: String? = nil
+    var approvedAt: Date? = nil
 
     init(
         id: UUID = UUID(),
