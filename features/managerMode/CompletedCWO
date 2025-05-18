@@ -1,0 +1,19 @@
+import SwiftUI
+
+struct CompletedCWOsView: View {
+    @Environment(\.dismiss) var dismiss
+
+    var body: some View {
+        ZStack {
+            StandardBackgroundView().ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                TopNavBar(title: "Accepted CWOs", onBack: { dismiss() }, onHome: { dismiss() })
+
+                Text("This view will show all approved CWOs, and offer export options.")
+                    .foregroundColor(.white)
+                    .padding()
+            }
+        }
+    }
+}
