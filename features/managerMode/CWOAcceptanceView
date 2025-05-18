@@ -1,41 +1,25 @@
 import SwiftUI
 
 struct CWOAcceptanceView: View {
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.dismiss) var dismiss
+    @ObservedObject var manager = CWOManager.shared
 
     var body: some View {
         ZStack {
-            Color(red: 0.0235, green: 0.1843, blue: 0.2941).ignoresSafeArea()
+            StandardBackgroundView().ignoresSafeArea()
 
-            VStack {
-                header
-                Spacer()
-                Text("CWO Acceptance View Placeholder")
-                    .foregroundColor(.white)
-                Spacer()
+            VStack(spacing: 0) {
+                TopNavBar(title: "CWO Acceptance", onBack: { dismiss() }, onHome: { dismiss() })
+
+                ScrollView {
+                    VStack(spacing: 16) {
+                        ForEach(manager.cwoList.filter { $0.status == "Pending" }) { cwo in
+                            CWOCard(cwo: cwo)
+                        }
+                    }
+                    .padding()
+                }
             }
         }
-    }
-
-    private var header: some View {
-        HStack {
-            Button(action: { dismiss() }) {
-                Image(systemName: "arrow.left")
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.blue)
-                    .clipShape(Circle())
-            }
-            Spacer()
-            NavigationLink(destination: HomeView()) {
-                Image(systemName: "house.fill")
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.blue)
-                    .clipShape(Circle())
-            }
-        }
-        .padding(.horizontal)
-        .padding(.top)
     }
 }
