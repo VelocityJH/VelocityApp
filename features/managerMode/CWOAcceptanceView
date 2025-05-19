@@ -26,7 +26,7 @@ struct CWOAcceptanceView: View {
                                     Text("Submitted by: \(cwo.submittedBy)")
                                     Text("Submitted on: \(cwo.timestamp.formatted(.dateTime))")
                                     Text("Description: \(cwo.description)")
-                                    
+
                                     if !cwo.parts.isEmpty {
                                         Text("Parts Required:")
                                             .font(.headline)
@@ -44,7 +44,19 @@ struct CWOAcceptanceView: View {
                                             .padding(.top, 8)
                                     }
 
-                                    // Approve / Reject will be added next
+                                    HStack {
+                                        Button("✅ Accept") {
+                                            cwoManager.approve(cwo: cwo)
+                                        }
+                                        .foregroundColor(.green)
+                                        .padding(.trailing)
+
+                                        Button("❌ Reject") {
+                                            cwoManager.reject(cwo: cwo)
+                                        }
+                                        .foregroundColor(.red)
+                                    }
+                                    .padding(.top, 6)
                                 }
                                 .padding()
                                 .background(Color.black.opacity(0.2))
