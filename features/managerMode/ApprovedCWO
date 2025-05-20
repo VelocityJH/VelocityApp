@@ -1,0 +1,31 @@
+import SwiftUI
+
+struct ApprovedCWOsView: View {
+    @Environment(\.dismiss) var dismiss
+    @ObservedObject var cwoManager = CWOManager.shared
+
+    var body: some View {
+        ZStack {
+            StandardBackgroundView().ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                TopNavBar(title: "Approved CWOs", onBack: { dismiss() }, onHome: { dismiss() })
+
+                ScrollView {
+                    if cwoManager.cwoList.filter({ $0.status == "Approved" }).isEmpty {
+                        Text("No approved CWOs yet.")
+                            .foregroundColor(.white)
+                            .padding(.top, 30)
+                    } else {
+                        VStack(spacing: 16) {
+                            ForEach(cwoManager.cwoList.filter { $0.status == "Approved" }) { cwo in
+                                CWOTileView(cwo: cwo)
+                            }
+                        }
+                        .padding(.top)
+                    }
+                }
+            }
+        }
+    }
+}
