@@ -1,0 +1,44 @@
+import SwiftUI
+
+struct CWOTileView: View {
+    var cwo: CWORequest
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Zone: \(cwo.zone)")
+            Text("Equipment: \(cwo.equipment)")
+            Text("Priority: \(cwo.priority)")
+            Text("Estimate: \(cwo.estimatedTime)")
+            Text("Submitted: \(cwo.timestamp.formatted(.dateTime.hour().minute()))")
+
+            if let imageData = cwo.imageData, let uiImage = UIImage(data: imageData) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 150)
+                    .cornerRadius(10)
+            }
+
+            HStack {
+                Button("Accept") {
+                    CWOManager.shared.approve(cwo: cwo)
+                }
+                .padding(.horizontal)
+                .background(Color.green)
+                .foregroundColor(.white)
+                .cornerRadius(8)
+
+                Button("Reject") {
+                    CWOManager.shared.reject(cwo: cwo)
+                }
+                .padding(.horizontal)
+                .background(Color.red)
+                .foregroundColor(.white)
+                .cornerRadius(8)
+            }
+        }
+        .padding()
+        .background(Color.black.opacity(0.2))
+        .cornerRadius(12)
+    }
+}
