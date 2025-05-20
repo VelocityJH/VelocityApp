@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct CWOAcceptanceView: View {
+    @Environment(\.dismiss) var dismiss
     @ObservedObject var cwoManager = CWOManager.shared
 
     var body: some View {
@@ -8,66 +9,24 @@ struct CWOAcceptanceView: View {
             StandardBackgroundView().ignoresSafeArea()
 
             VStack(spacing: 0) {
-                TopNavBar(title: "CWO Review", onBack: {}, onHome: {})
+                TopNavBar(title: "CWO Requests", onBack: { dismiss() }, onHome: { dismiss() })
 
                 ScrollView {
-                    if cwoManager.cwoList.filter({ $0.status == "Pending" }).isEmpty {
+                    if cwoManager.pendingCWOs.isEmpty {
                         Text("No pending CWOs")
                             .foregroundColor(.white)
                             .padding()
                     } else {
                         VStack(spacing: 16) {
-                            ForEach(cwoManager.cwoList.filter { $0.status == "Pending" }) { cwo in
-                                VStack(alignment: .leading, spacing: 10) {
-                                    Text("Zone: \(cwo.zone)").bold()
-                                    Text("Equipment: \(cwo.equipment)")
-                                    Text("Priority: \(cwo.priority)")
-                                    Text("Estimated Time: \(cwo.estimatedTime)")
-                                    Text("Submitted by: \(cwo.submittedBy)")
-                                    Text("Submitted on: \(cwo.timestamp.formatted(.dateTime))")
-                                    Text("Description: \(cwo.description)")
-
-                                    if !cwo.parts.isEmpty {
-                                        Text("Parts Required:")
-                                            .font(.headline)
-                                        ForEach(cwo.parts) { part in
-                                            Text("- \(part.name) (\(part.number))")
-                                        }
-                                    }
-
-                                    if let imageData = cwo.imageData, let uiImage = UIImage(data: imageData) {
-                                        Image(uiImage: uiImage)
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(maxHeight: 200)
-                                            .cornerRadius(8)
-                                            .padding(.top, 8)
-                                    }
-
-                                    HStack {
-                                        Button("✅ Accept") {
-                                            cwoManager.approve(cwo: cwo)
-                                        }
-                                        .foregroundColor(.green)
-                                        .padding(.trailing)
-
-                                        Button("❌ Reject") {
-                                            cwoManager.reject(cwo: cwo)
-                                        }
-                                        .foregroundColor(.red)
-                                    }
-                                    .padding(.top, 6)
-                                }
-                                .padding()
-                                .background(Color.black.opacity(0.2))
-                                .cornerRadius(12)
-                                .padding(.horizontal)
+                            ForEach(cwoManager.pendingCWOs) { cwo in
+                                CWOTileView(cwo: cwo)
                             }
                         }
-                        .padding(.top)
+                        .padding()
                     }
                 }
             }
         }
+        .navigationBarHidden(true)
     }
 }
