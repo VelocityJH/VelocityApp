@@ -1,32 +1,28 @@
-
 import SwiftUI
 
 struct ReportBreakdownView: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var userManager = UserManager.shared
     @ObservedObject var breakdownManager = BreakdownManager.shared
-    
+
     @State private var zone = ""
     @State private var equipment = ""
     @State private var faultSummary = ""
     @State private var navigateToControl = false
-    @State private var newBreakdown: Breakdown? = nil
-    
+    @State private var newBreakdown: Breakdown?
+
     var body: some View {
         ZStack {
             StandardBackgroundView().ignoresSafeArea()
-            
+
             VStack(spacing: 0) {
                 TopNavBar(title: "Report Breakdown", onBack: { dismiss() }, onHome: { dismiss() })
-                    
-                   
-                
+
                 ScrollView {
                     VStack(spacing: 20) {
                         Spacer(minLength: 40)
-                        // QR Code Zone Selector
+
                         Button("Scan Zone QR Code") {
-                            // Placeholder for future QR implementation
                             zone = "Zone 3 - Robot Arm 7"
                         }
                         .frame(maxWidth: .infinity)
@@ -34,19 +30,17 @@ struct ReportBreakdownView: View {
                         .background(Color.orange)
                         .foregroundColor(.white)
                         .cornerRadius(10)
-                        
+
                         TextField("Zone", text: $zone)
                             .textFieldStyle(.roundedBorder)
-                        
+
                         TextField("Equipment", text: $equipment)
                             .textFieldStyle(.roundedBorder)
-                        
+
                         TextField("Fault Summary", text: $faultSummary)
                             .textFieldStyle(.roundedBorder)
-                        
-                        // Camera Button
+
                         Button("Take Photo of Issue") {
-                            // Placeholder for future image picker
                             print("Camera tapped")
                         }
                         .frame(maxWidth: .infinity)
@@ -54,50 +48,52 @@ struct ReportBreakdownView: View {
                         .background(Color.blue)
                         .foregroundColor(.white)
                         .cornerRadius(10)
-                        
+
                         Button("Submit Breakdown") {
                             submitBreakdown()
                         }
                         .buttonStyle(.borderedProminent)
-                        
-                        // Improved NavigationLink
-                        if let breakdown = newBreakdown {
-                            
-                            NavigationLink(
-                                destination: BreakdownControlView(breakdown: breakdown),
-                                isActive: $navigateToControl,
-                                label: { EmptyView() }
-                            )
-                            .padding()
-                        }
                     }
+                    .padding()
                 }
             }
-            .navigationBarHidden(true)
-        }
-    }
-        
-        private func submitBreakdown() {
-            let reporter = userManager.username
-            let breakdown = Breakdown(
-                zone: zone,
-                equipment: equipment,
-                faultSummary: faultSummary,
-                submittedBy: reporter,
-                timeSubmitted: Date(),
-                status: "Open",
-                downtime: 0,
-                joinedEngineers: [],
-                endTime: nil,
-                completedBy: nil,
-                rectificationText: nil,
-                startTime: Date()
+
+            // Always-present NavigationLink
+            NavigationLink(
+                destination: {
+                    if let breakdown = newBreakdown {
+                        BreakdownControlView(breakdown: breakdown)
+                    } else {
+                        EmptyView()
+                    }
+                },
+                isActive: $navigateToControl,
+                label: { EmptyView() }
             )
-            
-            breakdownManager.addBreakdown(breakdown)
-            breakdownManager.joinJob(breakdown: breakdown)
-            newBreakdown = breakdown
-            navigateToControl = true
         }
+        .navigationBarHidden(true)
     }
 
+    func submitBreakdown() {
+        let reporter = userManager.username
+        let breakdown = Breakdown(
+            zone: zone,
+            equipment: equipment,
+            faultSummary: faultSummary,
+            submittedBy: reporter,
+            timeSubmitted: Date(),
+            status: "Open",
+            downtime: 0,
+            joinedEngineers: [],
+            endTime: nil,
+            completedBy: nil,
+            rectificationText: nil,
+            startTime: Date()
+        )
+
+        breakdownManager.addBreakdown(breakdown)
+        breakdownManager.joinJob(breakdown: breakdown)
+        newBreakdown = breakdown
+        navigateToControl = true
+    }
+}
