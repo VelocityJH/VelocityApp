@@ -5,9 +5,9 @@ struct ReportBreakdownView: View {
     @ObservedObject var breakdownManager = BreakdownManager.shared
     @ObservedObject var userManager = UserManager.shared
 
-    @State private var zone = ""
-    @State private var equipment = ""
-    @State private var faultSummary = ""
+    @State private var zone: String = ""
+    @State private var equipment: String = ""
+    @State private var faultSummary: String = ""
     @State private var navigateToControl = false
     @State private var newBreakdown: Breakdown?
 
@@ -31,17 +31,19 @@ struct ReportBreakdownView: View {
                 destination: {
                     if let breakdown = newBreakdown {
                         BreakdownControlView(breakdown: breakdown)
+                    } else {
+                        EmptyView()
                     }
                 },
                 isActive: $navigateToControl,
                 label: { EmptyView() }
             )
+            .disabled(newBreakdown == nil)
         }
         .padding()
         .navigationTitle("Report Breakdown")
     }
 
-    // MARK: - Function to Submit Breakdown
     private func submitBreakdown() {
         let reporter = userManager.username
         let breakdown = Breakdown(
@@ -61,7 +63,6 @@ struct ReportBreakdownView: View {
 
         breakdownManager.addBreakdown(breakdown)
         breakdownManager.joinJob(breakdown: breakdown)
-
         newBreakdown = breakdown
         navigateToControl = true
     }
