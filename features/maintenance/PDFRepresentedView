@@ -1,0 +1,24 @@
+struct PDFKitRepresentedView: UIViewRepresentable {
+    let document: PDFDocument
+    let searchTerm: String?
+
+    func makeUIView(context: Context) -> PDFView {
+        let pdfView = PDFView()
+        pdfView.document = document
+        pdfView.autoScales = true
+
+        if let searchTerm = searchTerm {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                if let match = document.findString(searchTerm, withOptions: .caseInsensitive).first {
+                    pdfView.go(to: match)
+                    pdfView.setCurrentSelection(match, animate: true)
+                    pdfView.highlightedSelections = [match]
+                }
+            }
+        }
+
+        return pdfView
+    }
+
+    func updateUIView(_ uiView: PDFView, context: Context) {}
+}
