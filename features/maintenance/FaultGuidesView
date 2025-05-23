@@ -1,62 +1,75 @@
 import SwiftUI
+import PDFKit
 
 struct FaultGuidesView: View {
-    @Environment(\.dismiss) var dismiss
-    @State private var searchText: String = ""
-    
-    // Sample placeholder data
+    @State private var searchText = ""
+
     let allGuides: [FaultGuide] = [
         FaultGuide(title: "Deprag Fault 515", tags: ["deprag", "515"], fileType: .pdf, filename: "Deprag_Fault_515.pdf"),
         FaultGuide(title: "ABB Robot E101", tags: ["abb", "robot", "E101"], fileType: .link, filename: "https://abb.com/fault/E101"),
         FaultGuide(title: "Fanuc Servo Alarm 17", tags: ["fanuc", "servo", "17"], fileType: .pdf, filename: "Fanuc_Servo_17.pdf")
     ]
-    
+
+    func extractText(from filename: String) -> String {
+        guard let url = Bundle.main.url(forResource: filename, withExtension: nil),
+              let document = PDFDocument(url: url) else { return "" }
+
+        var fullText = ""
+        for i in 0..<document.pageCount {
+            if let page = document.page(at: i), let pageText = page.string {
+                fullText += pageText + "\n"
+            }
+        }
+        return fullText
+    }
+
+    func matchesSearch(guide: FaultGuide, searchText: String) -> Bool {
+        if guide.fileType == .pdf {
+            let content = extractText(from: guide.filename)
+            return content.localizedCaseInsensitiveContains(searchText)
+        }
+        return false
+    }
+
     var filteredGuides: [FaultGuide] {
         if searchText.isEmpty {
-            return allGuides.sorted { $0.title < $1.title }
+            return allGuides
         } else {
-            return allGuides.filter {
-                $0.title.localizedCaseInsensitiveContains(searchText) ||
-                $0.tags.contains(where: { $0.localizedCaseInsensitiveContains(searchText) })
-            }.sorted { $0.title < $1.title }
+            return allGuides.filter { guide in
+                guide.title.localizedCaseInsensitiveContains(searchText) ||
+                guide.tags.contains(where: { $0.localizedCaseInsensitiveContains(searchText) }) ||
+                matchesSearch(guide: guide, searchText: searchText)
+            }
         }
     }
-    
+
     var body: some View {
         ZStack {
             StandardBackgroundView().ignoresSafeArea()
-            
             VStack(spacing: 0) {
-                TopNavBar(title: "Fault Trees & Guides", onBack: { dismiss() }, onHome: { dismiss() })
-                
-                // Search Bar
-                TextField("Search fault code, e.g. 515", text: $searchText)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding()
-                
-                // Scrollable List
+                TopNavBar(title: "Fault Guides", onBack: {}, onHome: {})
                 ScrollView {
-                    VStack(spacing: 12) {
+                    VStack(spacing: 16) {
+                        TextField("Search faults or codes...", text: $searchText)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .padding()
+
                         ForEach(filteredGuides) { guide in
                             HStack {
                                 Image(systemName: guide.iconName)
-                                    .foregroundColor(.white)
-                                    .padding(.trailing, 8)
-                                
                                 Text(guide.title)
-                                    .foregroundColor(.white)
-                                
+                                    .fontWeight(.medium)
                                 Spacer()
                             }
                             .padding()
-                            .background(Color.black.opacity(0.2))
-                            .cornerRadius(10)
+                            .background(Color.white.opacity(0.1))
+                            .cornerRadius(8)
+                            .padding(.horizontal)
                         }
                     }
-                    .padding()
+                    .padding(.top, 12)
                 }
             }
         }
-        .navigationBarHidden(true)
     }
 }
