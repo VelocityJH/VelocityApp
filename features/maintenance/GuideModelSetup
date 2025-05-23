@@ -1,0 +1,19 @@
+struct FaultGuide: Identifiable {
+    let id = UUID()
+    let title: String
+    let tags: [String]
+    let fileType: FileType
+    let filename: String
+    
+    var iconName: String {
+        switch fileType {
+        case .pdf: return "doc.text"
+        case .image: return "photo"
+        case .link: return "link"
+        }
+    }
+}
+
+enum FileType {
+    case pdf, image, link
+}
