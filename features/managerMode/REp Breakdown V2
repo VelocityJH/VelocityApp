@@ -1,0 +1,68 @@
+import SwiftUI
+
+struct ReportBreakdownView: View {
+    @Environment(\.dismiss) var dismiss
+    @ObservedObject var breakdownManager = BreakdownManager.shared
+    @ObservedObject var userManager = UserManager.shared
+
+    @State private var zone = ""
+    @State private var equipment = ""
+    @State private var faultSummary = ""
+    @State private var navigateToControl = false
+    @State private var newBreakdown: Breakdown?
+
+    var body: some View {
+        VStack(spacing: 20) {
+            TextField("Zone", text: $zone)
+                .textFieldStyle(.roundedBorder)
+
+            TextField("Equipment", text: $equipment)
+                .textFieldStyle(.roundedBorder)
+
+            TextField("Fault Summary", text: $faultSummary)
+                .textFieldStyle(.roundedBorder)
+
+            Button("Submit Breakdown") {
+                submitBreakdown()
+            }
+            .buttonStyle(.borderedProminent)
+
+            NavigationLink(
+                destination: {
+                    if let breakdown = newBreakdown {
+                        BreakdownControlView(breakdown: breakdown)
+                    }
+                },
+                isActive: $navigateToControl,
+                label: { EmptyView() }
+            )
+        }
+        .padding()
+        .navigationTitle("Report Breakdown")
+    }
+
+    // MARK: - Function to Submit Breakdown
+    private func submitBreakdown() {
+        let reporter = userManager.username
+        let breakdown = Breakdown(
+            zone: zone,
+            equipment: equipment,
+            faultSummary: faultSummary,
+            submittedBy: reporter,
+            timeSubmitted: Date(),
+            status: "Open",
+            downtime: 0,
+            joinedEngineers: [],
+            endTime: nil,
+            completedBy: nil,
+            rectificationText: nil,
+            startTime: Date()
+        )
+
+        breakdownManager.addBreakdown(breakdown)
+        breakdownManager.joinJob(breakdown: breakdown)
+
+        newBreakdown = breakdown
+        navigateToControl = true
+    }
+}
