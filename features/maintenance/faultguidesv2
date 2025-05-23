@@ -1,0 +1,80 @@
+import SwiftUI
+import PDFKit
+
+struct FaultGuidesView: View {
+    @State private var searchText = ""
+    @State private var selectedGuide: FaultGuide?
+    
+    let allGuides: [FaultGuide] = [
+        FaultGuide(title: "Deprag Fault Guide", tags: ["deprag", "515"], fileType: .pdf, filename: "Deprag Help Guide")
+        // Add more guides here...
+    ]
+    
+    var filteredGuides: [FaultGuide] {
+        if searchText.isEmpty {
+            return allGuides
+        } else {
+            return allGuides.filter { guide in
+                guide.title.localizedCaseInsensitiveContains(searchText) ||
+                guide.tags.contains(where: { $0.localizedCaseInsensitiveContains(searchText) }) ||
+                (guide.fileType == .pdf && extractText(from: guide.filename).localizedCaseInsensitiveContains(searchText))
+            }
+        }
+    }
+
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 0) {
+                TopNavBar(title: "Fault Trees & Guides", onBack: {}, onHome: {})
+                
+                TextField("Search fault code or keyword", text: $searchText)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding()
+
+                List(filteredGuides) { guide in
+                    Button {
+                        selectedGuide = guide
+                    } label: {
+                        HStack {
+                            Image(systemName: guide.iconName)
+                            Text(guide.title)
+                        }
+                    }
+                }
+            }
+            .sheet(item: $selectedGuide) { guide in
+                if guide.fileType == .pdf {
+                    PDFViewer(filename: guide.filename)
+                }
+                // Future: Add ImageViewer or LinkView as needed
+            }
+        }
+    }
+}
+
+struct PDFViewer: View {
+    let filename: String
+
+    var body: some View {
+        if let url = Bundle.main.url(forResource: filename, withExtension: "pdf"),
+           let document = PDFDocument(url: url) {
+            PDFKitRepresentedView(document: document)
+        } else {
+            Text("Unable to load PDF.")
+                .foregroundColor(.red)
+        }
+    }
+}
+
+struct PDFKitRepresentedView: UIViewRepresentable {
+    let document: PDFDocument
+    
+    func makeUIView(context: Context) -> PDFView {
+        let view = PDFView()
+        view.document = document
+        view.autoScales = true
+        return view
+    }
+
+    func updateUIView(_ uiView: PDFView, context: Context) {}
+}
