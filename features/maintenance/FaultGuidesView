@@ -73,3 +73,31 @@ struct FaultGuidesView: View {
         }
     }
 }
+
+
+struct PDFViewer: View {
+    let filename: String
+
+    var body: some View {
+        if let url = Bundle.main.url(forResource: filename, withExtension: "pdf"),
+           let document = PDFDocument(url: url) {
+            PDFKitView(document: document)
+        } else {
+            Text("PDF not found.")
+        }
+    }
+}
+
+struct PDFKitView: UIViewRepresentable {
+    let document: PDFDocument
+
+    func makeUIView(context: Context) -> PDFView {
+        let view = PDFView()
+        view.document = document
+        view.autoScales = true
+        return view
+    }
+
+    func updateUIView(_ uiView: PDFView, context: Context) {}
+}
+
