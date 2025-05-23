@@ -1,0 +1,19 @@
+import PDFKit
+
+func extractText(from filename: String) -> String {
+    guard let url = Bundle.main.url(forResource: filename, withExtension: nil),
+          let document = PDFDocument(url: url) else {
+        return ""
+    }
+
+    var fullText = ""
+
+    for pageIndex in 0..<document.pageCount {
+        if let page = document.page(at: pageIndex),
+           let pageText = page.string {
+            fullText += pageText + "\n"
+        }
+    }
+
+    return fullText
+}
