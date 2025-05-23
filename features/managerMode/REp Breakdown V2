@@ -1,13 +1,11 @@
-import SwiftUI
-
 struct ReportBreakdownView: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var userManager = UserManager.shared
     @ObservedObject var breakdownManager = BreakdownManager.shared
 
-    @State private var zone: String = ""
-    @State private var equipment: String = ""
-    @State private var faultSummary: String = ""
+    @State private var zone = ""
+    @State private var equipment = ""
+    @State private var faultSummary = ""
     @State private var navigateToControl = false
     @State private var newBreakdown: Breakdown?
 
@@ -15,61 +13,45 @@ struct ReportBreakdownView: View {
         ZStack {
             StandardBackgroundView().ignoresSafeArea()
 
-            VStack(spacing: 20) {
+            VStack(spacing: 0) {
                 TopNavBar(title: "Report Breakdown", onBack: { dismiss() }, onHome: { dismiss() })
 
-                // Placeholder for QR Scan
-                Button("Scan Zone/Equipment QR") {
-                    // Future: Trigger scanner here
-                }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(10)
+                ScrollView {
+                    VStack(spacing: 20) {
+                        TextField("Zone", text: $zone)
+                            .textFieldStyle(.roundedBorder)
 
-                TextField("Zone", text: $zone)
-                    .textFieldStyle(.roundedBorder)
+                        TextField("Equipment", text: $equipment)
+                            .textFieldStyle(.roundedBorder)
 
-                TextField("Equipment", text: $equipment)
-                    .textFieldStyle(.roundedBorder)
+                        TextField("Fault Summary", text: $faultSummary)
+                            .textFieldStyle(.roundedBorder)
 
-                TextField("Fault Summary", text: $faultSummary)
-                    .textFieldStyle(.roundedBorder)
-
-                // Placeholder for Image Picker
-                Button("Capture Image of Issue") {
-                    // Future: Trigger camera/image picker here
-                }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.orange)
-                .foregroundColor(.white)
-                .cornerRadius(10)
-
-                Button("Submit Breakdown") {
-                    submitBreakdown()
-                }
-                .buttonStyle(.borderedProminent)
-
-                NavigationLink(
-                    destination: {
-                        if let breakdown = newBreakdown {
-                            BreakdownControlView(breakdown: breakdown)
+                        Button("Submit Breakdown") {
+                            submitBreakdown()
                         }
-                    },
-                    isActive: $navigateToControl,
-                    label: { EmptyView() }
-                )
+                        .buttonStyle(.borderedProminent)
+
+                        NavigationLink(
+                            destination: {
+                                if let breakdown = newBreakdown {
+                                    BreakdownControlView(breakdown: breakdown)
+                                }
+                            },
+                            isActive: $navigateToControl,
+                            label: { EmptyView() }
+                        )
+                    }
+                    .padding()
+                }
             }
-            .padding()
         }
         .navigationBarHidden(true)
     }
 
+    // ✅ Move this outside `body`
     private func submitBreakdown() {
         let reporter = userManager.username
-
         let breakdown = Breakdown(
             zone: zone,
             equipment: equipment,
