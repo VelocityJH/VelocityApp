@@ -2,8 +2,8 @@ import SwiftUI
 
 struct ReportBreakdownView: View {
     @Environment(\.dismiss) var dismiss
-    @ObservedObject var breakdownManager = BreakdownManager.shared
     @ObservedObject var userManager = UserManager.shared
+    @ObservedObject var breakdownManager = BreakdownManager.shared
 
     @State private var zone: String = ""
     @State private var equipment: String = ""
@@ -12,40 +12,64 @@ struct ReportBreakdownView: View {
     @State private var newBreakdown: Breakdown?
 
     var body: some View {
-        VStack(spacing: 20) {
-            TextField("Zone", text: $zone)
-                .textFieldStyle(.roundedBorder)
+        ZStack {
+            StandardBackgroundView().ignoresSafeArea()
 
-            TextField("Equipment", text: $equipment)
-                .textFieldStyle(.roundedBorder)
+            VStack(spacing: 20) {
+                TopNavBar(title: "Report Breakdown", onBack: { dismiss() }, onHome: { dismiss() })
 
-            TextField("Fault Summary", text: $faultSummary)
-                .textFieldStyle(.roundedBorder)
+                // Placeholder for QR Scan
+                Button("Scan Zone/Equipment QR") {
+                    // Future: Trigger scanner here
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(10)
 
-            Button("Submit Breakdown") {
-                submitBreakdown()
+                TextField("Zone", text: $zone)
+                    .textFieldStyle(.roundedBorder)
+
+                TextField("Equipment", text: $equipment)
+                    .textFieldStyle(.roundedBorder)
+
+                TextField("Fault Summary", text: $faultSummary)
+                    .textFieldStyle(.roundedBorder)
+
+                // Placeholder for Image Picker
+                Button("Capture Image of Issue") {
+                    // Future: Trigger camera/image picker here
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.orange)
+                .foregroundColor(.white)
+                .cornerRadius(10)
+
+                Button("Submit Breakdown") {
+                    submitBreakdown()
+                }
+                .buttonStyle(.borderedProminent)
+
+                NavigationLink(
+                    destination: {
+                        if let breakdown = newBreakdown {
+                            BreakdownControlView(breakdown: breakdown)
+                        }
+                    },
+                    isActive: $navigateToControl,
+                    label: { EmptyView() }
+                )
             }
-            .buttonStyle(.borderedProminent)
-
-            NavigationLink(
-                destination: {
-                    if let breakdown = newBreakdown {
-                        BreakdownControlView(breakdown: breakdown)
-                    } else {
-                        EmptyView()
-                    }
-                },
-                isActive: $navigateToControl,
-                label: { EmptyView() }
-            )
-            .disabled(newBreakdown == nil)
+            .padding()
         }
-        .padding()
-        .navigationTitle("Report Breakdown")
+        .navigationBarHidden(true)
     }
 
     private func submitBreakdown() {
         let reporter = userManager.username
+
         let breakdown = Breakdown(
             zone: zone,
             equipment: equipment,
