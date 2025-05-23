@@ -1,3 +1,5 @@
+import SwiftUI
+
 struct ReportBreakdownView: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var userManager = UserManager.shared
@@ -18,6 +20,17 @@ struct ReportBreakdownView: View {
 
                 ScrollView {
                     VStack(spacing: 20) {
+                        // QR Code Zone Selector
+                        Button("Scan Zone QR Code") {
+                            // Placeholder for future QR implementation
+                            zone = "Zone 3 - Robot Arm 7"
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.orange)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+
                         TextField("Zone", text: $zone)
                             .textFieldStyle(.roundedBorder)
 
@@ -27,15 +40,29 @@ struct ReportBreakdownView: View {
                         TextField("Fault Summary", text: $faultSummary)
                             .textFieldStyle(.roundedBorder)
 
+                        // Camera Button
+                        Button("Take Photo of Issue") {
+                            // Placeholder for future image picker
+                            print("Camera tapped")
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+
                         Button("Submit Breakdown") {
                             submitBreakdown()
                         }
                         .buttonStyle(.borderedProminent)
 
+                        // Improved NavigationLink
                         NavigationLink(
                             destination: {
                                 if let breakdown = newBreakdown {
                                     BreakdownControlView(breakdown: breakdown)
+                                } else {
+                                    EmptyView()
                                 }
                             },
                             isActive: $navigateToControl,
@@ -49,7 +76,6 @@ struct ReportBreakdownView: View {
         .navigationBarHidden(true)
     }
 
-    // ✅ Move this outside `body`
     private func submitBreakdown() {
         let reporter = userManager.username
         let breakdown = Breakdown(
