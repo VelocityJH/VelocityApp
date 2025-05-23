@@ -1,6 +1,18 @@
+import SwiftUI
+import PDFKit
+
 struct PDFKitRepresentedView: UIViewRepresentable {
     let document: PDFDocument
     let searchTerm: String?
+
+    class Coordinator {
+        var matches: [PDFSelection] = []
+        var currentIndex = 0
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
 
     func makeUIView(context: Context) -> PDFView {
         let pdfView = PDFView()
@@ -9,10 +21,11 @@ struct PDFKitRepresentedView: UIViewRepresentable {
 
         if let searchTerm = searchTerm {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                if let match = document.findString(searchTerm, withOptions: .caseInsensitive).first {
-                    pdfView.go(to: match)
-                    pdfView.setCurrentSelection(match, animate: true)
-                    pdfView.highlightedSelections = [match]
+                context.coordinator.matches = document.findString(searchTerm, withOptions: .caseInsensitive)
+                if let firstMatch = context.coordinator.matches.first {
+                    pdfView.go(to: firstMatch)
+                    pdfView.setCurrentSelection(firstMatch, animate: true)
+                    pdfView.highlightedSelections = context.coordinator.matches
                 }
             }
         }
@@ -20,5 +33,7 @@ struct PDFKitRepresentedView: UIViewRepresentable {
         return pdfView
     }
 
-    func updateUIView(_ uiView: PDFView, context: Context) {}
+    func updateUIView(_ pdfView: PDFView, context: Context) {
+        // Optional: hook up UI buttons to navigate matches
+    }
 }
