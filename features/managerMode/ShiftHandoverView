@@ -1,41 +1,124 @@
 import SwiftUI
 
+enum ShiftArea: String, CaseIterable {
+    case underbody = "Underbody"
+    case framing = "Framing"
+    case cosmetics = "Cosmetics"
+}
+
 struct ShiftHandoverView: View {
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.dismiss) var dismiss
+    @ObservedObject var breakdownManager = BreakdownManager.shared
+
+    @State private var selectedArea: ShiftArea = .underbody
+    @State private var expandedBreakdownIDs: Set<UUID> = []
 
     var body: some View {
         ZStack {
-            Color(red: 0.0235, green: 0.1843, blue: 0.2941).ignoresSafeArea()
+            StandardBackgroundView().ignoresSafeArea()
 
-            VStack {
-                header
-                Spacer()
-                Text("Shift Handover View Placeholder")
-                    .foregroundColor(.white)
-                Spacer()
+            VStack(spacing: 0) {
+                TopNavBar(title: "Shift Handover", onBack: { dismiss() }, onHome: { dismiss() })
+
+                // Area Filters
+                HStack {
+                    ForEach(ShiftArea.allCases, id: \.self) { area in
+                        Button(area.rawValue) {
+                            selectedArea = area
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(8)
+                        .background(selectedArea == area ? Color.blue : Color.gray)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                    }
+                }
+                .padding()
+
+                // Filtered & Sorted Breakdown List
+                ScrollView {
+                    VStack(spacing: 12) {
+                        ForEach(filteredBreakdowns, id: \.id) { breakdown in
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack {
+                                    Text("Zone: \(breakdown.zone)")
+                                        .bold()
+                                    Spacer()
+                                    Text("⏱ \(elapsedMinutes(breakdown)) mins")
+                                        .foregroundColor(.gray)
+                                }
+
+                                Text("Equipment: \(breakdown.equipment)")
+
+                                // Expandable content
+                                if expandedBreakdownIDs.contains(breakdown.id) {
+                                    Divider()
+                                    if !breakdown.partsUsed.isEmpty {
+                                        Text("Parts Used:")
+                                            .font(.headline)
+                                        ForEach(breakdown.partsUsed) { part in
+                                            Text("- \(part.name) (\(part.location))")
+                                        }
+                                    }
+
+                                    if let rectification = breakdown.rectificationText {
+                                        Text("Rectification:")
+                                            .font(.headline)
+                                            .padding(.top, 4)
+                                        Text(rectification)
+                                    }
+                                }
+
+                                Button(expandedBreakdownIDs.contains(breakdown.id) ? "Hide Details" : "View Details") {
+                                    if expandedBreakdownIDs.contains(breakdown.id) {
+                                        expandedBreakdownIDs.remove(breakdown.id)
+                                    } else {
+                                        expandedBreakdownIDs.insert(breakdown.id)
+                                    }
+                                }
+                                .font(.caption)
+                                .foregroundColor(.blue)
+                            }
+                            .padding()
+                            .background(Color.black.opacity(0.2))
+                            .cornerRadius(10)
+                        }
+                    }
+                    .padding()
+                }
             }
         }
     }
 
-    private var header: some View {
-        HStack {
-            Button(action: { dismiss() }) {
-                Image(systemName: "arrow.left")
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.blue)
-                    .clipShape(Circle())
-            }
-            Spacer()
-            NavigationLink(destination: HomeView()) {
-                Image(systemName: "house.fill")
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.blue)
-                    .clipShape(Circle())
-            }
+    // MARK: - Helpers
+
+    var filteredBreakdowns: [Breakdown] {
+        let zones = zonesForSelectedArea()
+        let cutoff = Date().addingTimeInterval(-12 * 60 * 60) // 12 hours ago
+
+        return breakdownManager.completedBreakdowns.filter {
+            zones.contains($0.zone) &&
+            elapsedMinutes($0) > 15 &&
+            $0.endTime ?? Date.distantPast > cutoff
         }
-        .padding(.horizontal)
-        .padding(.top)
+        .sorted {
+            elapsedMinutes($0) > elapsedMinutes($1)
+        }
+    }
+
+    func zonesForSelectedArea() -> [String] {
+        switch selectedArea {
+        case .underbody:
+            return ["2", "3", "4", "6", "8"]
+        case .framing:
+            return ["9", "10", "11", "12", "22.1", "22.2", "22.3", "22.4", "22.5"]
+        case .cosmetics:
+            return ["15", "16", "17", "18", "19", "CLAD", "STP"]
+        }
+    }
+
+    func elapsedMinutes(_ breakdown: Breakdown) -> Int {
+        guard let end = breakdown.endTime else { return 0 }
+        return Int(end.timeIntervalSince(breakdown.startTime) / 60)
     }
 }
