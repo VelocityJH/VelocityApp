@@ -4,13 +4,13 @@ struct ReportBreakdownView: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var userManager = UserManager.shared
     @ObservedObject var breakdownManager = BreakdownManager.shared
-
+    
     @State private var zone = ""
     @State private var equipment = ""
     @State private var faultSummary = ""
     @State private var navigateToControl = false
-    @State private var newBreakdown: Breakdown?
-
+    @State private var newBreakdown: Breakdown? = nil
+    
     var body: some View {
         ZStack {
             StandardBackgroundView().ignoresSafeArea()
@@ -22,7 +22,9 @@ struct ReportBreakdownView: View {
                     VStack(spacing: 20) {
                         Spacer(minLength: 40)
 
+                        // Zone QR scan
                         Button("Scan Zone QR Code") {
+                            // Placeholder for QR code scan
                             zone = "Zone 3 - Robot Arm 7"
                         }
                         .frame(maxWidth: .infinity)
@@ -40,7 +42,9 @@ struct ReportBreakdownView: View {
                         TextField("Fault Summary", text: $faultSummary)
                             .textFieldStyle(.roundedBorder)
 
+                        // Photo of issue
                         Button("Take Photo of Issue") {
+                            // Placeholder for camera/image picker
                             print("Camera tapped")
                         }
                         .frame(maxWidth: .infinity)
@@ -53,25 +57,30 @@ struct ReportBreakdownView: View {
                             submitBreakdown()
                         }
                         .buttonStyle(.borderedProminent)
+
+                        NavigationLink(
+                            destination: destinationView,
+                            isActive: $navigateToControl,
+                            label: { EmptyView() }
+                        )
+                        .hidden()
                     }
                     .padding()
                 }
             }
-
-            // Always-present NavigationLink
-            NavigationLink(
-                destination: {
-                    if let breakdown = newBreakdown {
-                        BreakdownControlView(breakdown: breakdown)
-                    } else {
-                        EmptyView()
-                    }
-                },
-                isActive: $navigateToControl,
-                label: { EmptyView() }
-            )
         }
         .navigationBarHidden(true)
+    }
+
+    // Computed destination for NavigationLink
+    var destinationView: some View {
+        Group {
+            if let breakdown = newBreakdown {
+                BreakdownControlView(breakdown: breakdown)
+            } else {
+                EmptyView()
+            }
+        }
     }
 
     func submitBreakdown() {
@@ -90,7 +99,7 @@ struct ReportBreakdownView: View {
             rectificationText: nil,
             startTime: Date()
         )
-
+        
         breakdownManager.addBreakdown(breakdown)
         breakdownManager.joinJob(breakdown: breakdown)
         newBreakdown = breakdown
