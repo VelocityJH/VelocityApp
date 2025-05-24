@@ -21,11 +21,20 @@ struct PDFKitRepresentedView: UIViewRepresentable {
 
         if let searchTerm = searchTerm {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                context.coordinator.matches = document.findString(searchTerm, withOptions: .caseInsensitive)
+                context.coordinator.matches = document.findString(searchTerm.trimmingCharacters(in: .whitespacesAndNewlines), withOptions: [.regularExpression, .caseInsensitive])
+                
                 if let firstMatch = context.coordinator.matches.first {
                     pdfView.go(to: firstMatch)
                     pdfView.setCurrentSelection(firstMatch, animate: true)
                     pdfView.highlightedSelections = context.coordinator.matches
+                }
+            }
+            NotificationCenter.default.addObserver(forName: .goToNextSearchResult, object: nil, queue: .main) { _ in
+                if !context.coordinator.matches.isEmpty {
+                    context.coordinator.currentIndex = (context.coordinator.currentIndex + 1) % context.coordinator.matches.count
+                    let nextMatch = context.coordinator.matches[context.coordinator.currentIndex]
+                    pdfView.go(to: nextMatch)
+                    pdfView.setCurrentSelection(nextMatch, animate: true)
                 }
             }
         }
